@@ -4,13 +4,14 @@
 
 #include "Application.h"
 
-Application::Application(int argc, char *argv[]) {
-    gui = new Gui(argc, argv);
+Application::Application(int argc, char *argv[], unsigned int gridSize) {
+    gameLogic = new GameLogic(gridSize);
+    gui = new Gui(argc, argv, gameLogic);
 }
 
 Application::~Application() {
     delete gui;
-//    delete gameLogic;
+    delete gameLogic;
 }
 
 int Application::run() {

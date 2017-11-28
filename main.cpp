@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[]) {
     int status = 0;
-    Application application(argc, argv);
+    Application application(argc, argv, 16);
 
     status = application.run();
 
