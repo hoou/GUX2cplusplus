@@ -235,6 +235,14 @@ void Gui::removeWidget(GtkWidget *widget, gpointer data) {
     gtk_container_remove(GTK_CONTAINER(gui->layoutContainer), widget);
 }
 
+void Gui::changeFontSizeOfWidget(GtkWidget *widget, unsigned int fontSize) {
+    GtkCssProvider *provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(provider, (".button {font-size: " + std::to_string(fontSize) + "px}").c_str(), -1,
+                                    nullptr);
+    GtkStyleContext *context = gtk_widget_get_style_context(widget);
+    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
+}
+
 // CALLBACKS
 
 void Gui::destroyMainWindowCB(GtkWidget *widget, gpointer data) {
@@ -282,12 +290,11 @@ void Gui::playGridButtonClickedCB(GtkWidget *widget, gpointer data) {
 }
 
 void Gui::playGridButtonSizeAllocateCB(GtkWidget *widget, gpointer data) {
-    GtkCssProvider *provider = gtk_css_provider_new();
+    auto *gui = static_cast<Gui *>(data);
+
     auto fontSize = static_cast<unsigned int>(gtk_widget_get_allocated_width(widget) / 2.0);
-    gtk_css_provider_load_from_data(provider, (".button {font-size: " + std::to_string(fontSize) + "px}").c_str(), -1,
-                                    nullptr);
-    GtkStyleContext *context = gtk_widget_get_style_context(widget);
-    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
+
+    gui->changeFontSizeOfWidget(widget, fontSize);
 }
 
 void Gui::updateActivePlayerLabel() {

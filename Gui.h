@@ -54,6 +54,8 @@ private:
 
     void updateActivePlayerLabel();
 
+    void changeFontSizeOfWidget(GtkWidget *widget, unsigned int fontSize);
+
     // Callbacks
     static void activateApplicationCB(GtkApplication *app, gpointer data);
 
