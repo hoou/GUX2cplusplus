@@ -24,12 +24,6 @@ void Gui::createMainWindow() {
     mainWindow = gtk_application_window_new(gtkApplication);
     gtk_window_set_title(GTK_WINDOW(mainWindow), "Piskvorky");
 
-    // Set minimum size of the main window and aspect ratio to 1:1
-    GdkGeometry hints{};
-    hints.min_aspect = hints.max_aspect = 1;
-
-    gtk_window_set_geometry_hints(GTK_WINDOW(mainWindow), mainWindow, &hints, GDK_HINT_ASPECT);
-
     g_signal_connect(mainWindow, "destroy", G_CALLBACK(destroyMainWindowCB), this);
 }
 
@@ -167,13 +161,18 @@ void Gui::showHomeScreen() {
 }
 
 void Gui::showPlayGrid() {
+    GtkWidget *aspectFrame;
+
     hideAllWidgetsInLayoutGrid();
 
     createMenuBar();
     createPlayGrid();
 
+    aspectFrame = gtk_aspect_frame_new(nullptr, 0.5, 0.5, 1, false);
+    gtk_container_add(GTK_CONTAINER(aspectFrame), playGrid);
+
     gtk_grid_attach(GTK_GRID(layoutGrid), menuBarBox, 0, 0, 1, 1);
-    gtk_grid_attach(GTK_GRID(layoutGrid), playGrid, 0, 1, 1, 1);
+    gtk_grid_attach(GTK_GRID(layoutGrid), aspectFrame, 0, 1, 1, 1);
 
     gtk_widget_show_all(mainWindow);
 }
