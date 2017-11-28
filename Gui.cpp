@@ -219,7 +219,7 @@ void Gui::getButtonIndices(GtkWidget *widget, unsigned long *row, unsigned long 
     *col = static_cast<unsigned long>(left);
 }
 
-void Gui::redrawButton(GtkWidget *widget) {
+void Gui::redrawButton(GtkWidget *widget, std::string color) {
     unsigned long row, col;
 
     getButtonIndices(widget, &row, &col);
@@ -227,6 +227,8 @@ void Gui::redrawButton(GtkWidget *widget) {
     Cell *cell = gameLogic->getCell(row, col);
 
     gtk_button_set_label(GTK_BUTTON(widget), cell->getStringValue().c_str());
+
+    changeFontColorOfWidget(gtk_bin_get_child(GTK_BIN(widget)), color);
 }
 
 void Gui::removeWidget(GtkWidget *widget, gpointer data) {
@@ -237,8 +239,15 @@ void Gui::removeWidget(GtkWidget *widget, gpointer data) {
 
 void Gui::changeFontSizeOfWidget(GtkWidget *widget, unsigned int fontSize) {
     GtkCssProvider *provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(provider, (".button {font-size: " + std::to_string(fontSize) + "px}").c_str(), -1,
+    gtk_css_provider_load_from_data(provider, ("* {font-size: " + std::to_string(fontSize) + "px}").c_str(), -1,
                                     nullptr);
+    GtkStyleContext *context = gtk_widget_get_style_context(widget);
+    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
+}
+
+void Gui::changeFontColorOfWidget(GtkWidget *widget, const std::string &color) {
+    GtkCssProvider *provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(provider, ("* {color: " + color + "}").c_str(), -1, nullptr);
     GtkStyleContext *context = gtk_widget_get_style_context(widget);
     gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 }
@@ -258,13 +267,14 @@ void Gui::playGridButtonClickedCB(GtkWidget *widget, gpointer data) {
     unsigned long row, col;
     bool result;
     auto *gui = (Gui *) data;
+    std::string color = gui->gameLogic->getActivePlayer()->getColor();
 
     gui->getButtonIndices(widget, &row, &col);
 
     result = gui->gameLogic->updateGrid(row, col);
 
     if (result) {
-        gui->redrawButton(widget);
+        gui->redrawButton(widget, color);
 
         Player *winner = gui->gameLogic->getWinner();
         if (winner) {
