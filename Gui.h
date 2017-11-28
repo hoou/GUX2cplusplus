@@ -61,6 +61,8 @@ private:
 
     static void playGridButtonClickedCB(GtkWidget *widget, gpointer data);
 
+    static void playGridButtonSizeAllocateCB(GtkWidget *widget, gpointer data);
+
     static gboolean drawWinStroke(GtkWidget *widget, cairo_t *cr, gpointer data);
 
     static void startButtonClickedCB(GtkWidget *widget, gpointer data);

@@ -24,6 +24,12 @@ void Gui::createMainWindow() {
     mainWindow = gtk_application_window_new(gtkApplication);
     gtk_window_set_title(GTK_WINDOW(mainWindow), "Piskvorky");
 
+    GdkGeometry hints{};
+    hints.min_width = 512;
+    hints.min_height = 512;
+
+    gtk_window_set_geometry_hints(GTK_WINDOW(mainWindow), mainWindow, &hints, GDK_HINT_MIN_SIZE);
+
     g_signal_connect(mainWindow, "destroy", G_CALLBACK(destroyMainWindowCB), this);
 }
 
@@ -140,6 +146,7 @@ void Gui::createPlayGrid() {
             gtk_widget_set_vexpand(overlay, true);
 
             g_signal_connect(button, "clicked", G_CALLBACK(playGridButtonClickedCB), this);
+            g_signal_connect(button, "size-allocate", G_CALLBACK(playGridButtonSizeAllocateCB), this);
 
             gtk_grid_attach(GTK_GRID(playGrid), overlay, row, col, 1, 1);
         }
@@ -272,6 +279,15 @@ void Gui::playGridButtonClickedCB(GtkWidget *widget, gpointer data) {
 
         gui->updateActivePlayerLabel();
     }
+}
+
+void Gui::playGridButtonSizeAllocateCB(GtkWidget *widget, gpointer data) {
+    GtkCssProvider *provider = gtk_css_provider_new();
+    auto fontSize = static_cast<unsigned int>(gtk_widget_get_allocated_width(widget) / 2.0);
+    gtk_css_provider_load_from_data(provider, (".button {font-size: " + std::to_string(fontSize) + "px}").c_str(), -1,
+                                    nullptr);
+    GtkStyleContext *context = gtk_widget_get_style_context(widget);
+    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 }
 
 void Gui::updateActivePlayerLabel() {
