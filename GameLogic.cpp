@@ -5,12 +5,14 @@
 #include "GameLogic.h"
 #include <iostream>
 
-GameLogic::GameLogic(unsigned int gridSize) : gridSize(gridSize) {
+GameLogic::GameLogic(unsigned int gridSize, unsigned int numberOfCellsInRowToWin) : gridSize(gridSize),
+                                                                                    numberOfCellsInRowToWin(
+                                                                                            numberOfCellsInRowToWin) {
     initCells();
 
     for (const auto &player : players) {
         std::string winSymbolSequence;
-        for (int i = 0; i < NUMBER_OF_CELLS_IN_ROW_TO_WIN; i++) {
+        for (int i = 0; i < numberOfCellsInRowToWin; i++) {
             winSymbolSequence.append(Cell::convertValueToString(player.getSymbol()));
         }
 
@@ -72,9 +74,9 @@ bool GameLogic::doWeHaveWinner(unsigned long row, unsigned long col) {
     std::string cellValues;
 
     // Check row
-    unsigned int offsetBegin = (unsigned int) std::max(0, int(col - NUMBER_OF_CELLS_IN_ROW_TO_WIN + 1));
+    unsigned int offsetBegin = (unsigned int) std::max(0, int(col - numberOfCellsInRowToWin + 1));
     unsigned int offsetEnd = gridSize - 1 -
-                             (unsigned int) std::min((unsigned int) col + NUMBER_OF_CELLS_IN_ROW_TO_WIN - 1,
+                             (unsigned int) std::min((unsigned int) col + numberOfCellsInRowToWin - 1,
                                                      gridSize - 1);
 
     for (auto it = cells.at(row).begin() + offsetBegin; it < cells.at(row).end() - offsetEnd; it++) {
@@ -92,9 +94,9 @@ bool GameLogic::doWeHaveWinner(unsigned long row, unsigned long col) {
     cellValues = "";
 
     // Check column
-    offsetBegin = (unsigned int) std::max(0, int(row - NUMBER_OF_CELLS_IN_ROW_TO_WIN + 1));
+    offsetBegin = (unsigned int) std::max(0, int(row - numberOfCellsInRowToWin + 1));
     offsetEnd = gridSize - 1 -
-                (unsigned int) std::min((unsigned int) row + NUMBER_OF_CELLS_IN_ROW_TO_WIN - 1, gridSize - 1);
+                (unsigned int) std::min((unsigned int) row + numberOfCellsInRowToWin - 1, gridSize - 1);
 
 
     for (auto it = cells.begin() + offsetBegin; it < cells.end() - offsetEnd; it++) {
@@ -122,7 +124,7 @@ bool GameLogic::doWeHaveWinner(unsigned long row, unsigned long col) {
     if (smallerIndex > 4)
         smallerIndex = 4;
 
-    for (long i = -smallerIndex; i < (-smallerIndex + smallerIndex + NUMBER_OF_CELLS_IN_ROW_TO_WIN); i++) {
+    for (long i = -smallerIndex; i < (-smallerIndex + smallerIndex + numberOfCellsInRowToWin); i++) {
         if (row + i >= gridSize || col + i >= gridSize)
             break;
 
@@ -150,7 +152,7 @@ bool GameLogic::doWeHaveWinner(unsigned long row, unsigned long col) {
     if (smallerIndex > 4)
         smallerIndex = 4;
 
-    for (long i = -smallerIndex; i < (-smallerIndex + smallerIndex + NUMBER_OF_CELLS_IN_ROW_TO_WIN); i++) {
+    for (long i = -smallerIndex; i < (-smallerIndex + smallerIndex + numberOfCellsInRowToWin); i++) {
         if (row + i >= gridSize || col - i >= gridSize)
             break;
 
@@ -199,7 +201,7 @@ void GameLogic::setupWinningCells() {
             return;
     }
 
-    for (i = 0; i < NUMBER_OF_CELLS_IN_ROW_TO_WIN; i++) {
+    for (i = 0; i < numberOfCellsInRowToWin; i++) {
         negativei = -i;
         Cell *cell = cells.at(firstWinningCellRow + *rowOffset).at(firstWinningCellCol + *colOffset);
         cell->setWinningCellSequenceDirection(winningCellSequenceDirection);

@@ -10,12 +10,12 @@
 #include "Cell.h"
 #include "Player.h"
 
-#define NUMBER_OF_CELLS_IN_ROW_TO_WIN 5
 #define NUMBER_OF_PLAYERS 2
 
 class GameLogic {
 private:
     unsigned int gridSize;
+    unsigned int numberOfCellsInRowToWin;
     std::vector<std::vector<Cell *>> cells;
     Player players[NUMBER_OF_PLAYERS]{{"Player1", X},
                                       {"Player2", O}};
@@ -41,7 +41,7 @@ private:
 
 public:
 
-    explicit GameLogic(unsigned int gridSize);
+    explicit GameLogic(unsigned int gridSize, unsigned int numberOfCellsInRowToWin);
 
     virtual ~GameLogic();
 

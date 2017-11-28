@@ -4,8 +4,8 @@
 
 #include "Application.h"
 
-Application::Application(int argc, char *argv[], unsigned int gridSize) {
-    gameLogic = new GameLogic(gridSize);
+Application::Application(int argc, char *argv[], unsigned int gridSize, unsigned int numberOfCellsInRowToWin) {
+    gameLogic = new GameLogic(gridSize, numberOfCellsInRowToWin);
     gui = new Gui(argc, argv, gameLogic);
 }
 

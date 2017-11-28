@@ -15,7 +15,7 @@ private:
     GameLogic *gameLogic;
 
 public:
-    Application(int argc, char *argv[], unsigned int gridSize);
+    Application(int argc, char *argv[], unsigned int gridSize, unsigned int numberOfCellsInRowToWin);
 
     ~Application();
 
