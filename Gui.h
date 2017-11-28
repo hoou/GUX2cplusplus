@@ -44,6 +44,8 @@ private:
 
     void showGameScreen();
 
+    void showGameOverWindow(Player *winner);
+
     void initGui();
 
     void redrawButton(GtkWidget *widget, std::string color);
@@ -59,6 +61,8 @@ private:
     void changeFontSizeOfWidget(GtkWidget *widget, unsigned int fontSize);
 
     void changeFontColorOfWidget(GtkWidget *widget, const std::string &color);
+
+    void startNewGame();
 
     // Callbacks
     static void activateApplicationCB(GtkApplication *app, gpointer data);
@@ -78,6 +82,8 @@ private:
     static void numberOfCellsInRowToWinButtonToggledCB(GtkToggleButton *toggleButton, gpointer data);
 
     static void colorButtonColorSetCB(GtkColorButton *widget, gpointer data);
+
+    static void gameOverDialogResponseCB(GtkDialog *dialog, gint responseId, gpointer data);
 
     // Menu items callbacks
 

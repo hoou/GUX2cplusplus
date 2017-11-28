@@ -236,6 +236,21 @@ void Gui::showGameScreen() {
     gtk_widget_show_all(mainWindow);
 }
 
+void Gui::showGameOverWindow(Player *winner) {
+    std::string message = winner->getName() + " wins! Congratulations!\n";
+    GtkWidget *gameOverDialog = gtk_message_dialog_new(GTK_WINDOW(mainWindow), GTK_DIALOG_MODAL, GTK_MESSAGE_INFO,
+                                                       GTK_BUTTONS_NONE, "%s", message.c_str());
+
+    gtk_dialog_add_button(GTK_DIALOG(gameOverDialog), "New game", GTK_RESPONSE_YES);
+    gtk_dialog_add_button(GTK_DIALOG(gameOverDialog), "Restart game", GTK_RESPONSE_NO);
+    gtk_dialog_add_button(GTK_DIALOG(gameOverDialog), "Close", GTK_RESPONSE_CLOSE);
+
+
+    g_signal_connect(gameOverDialog, "response", G_CALLBACK(gameOverDialogResponseCB), this);
+
+    gtk_widget_show_all(gameOverDialog);
+}
+
 void Gui::getButtonIndices(GtkWidget *widget, unsigned long *row, unsigned long *col) {
     gint left, top;
 
@@ -280,6 +295,14 @@ void Gui::changeFontColorOfWidget(GtkWidget *widget, const std::string &color) {
     gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 }
 
+void Gui::startNewGame() {
+    delete gameLogic;
+    gameLogic = new GameLogic(gridSizeScaleValue, numberOfCellsInRowToWin, player1color, player2color);
+
+    showGameScreen();
+    updateActivePlayerLabel();
+}
+
 // CALLBACKS
 
 void Gui::destroyMainWindowCB(GtkWidget *widget, gpointer data) {
@@ -306,7 +329,7 @@ void Gui::playGridButtonClickedCB(GtkWidget *widget, gpointer data) {
 
         Player *winner = gui->gameLogic->getWinner();
         if (winner) {
-            std::cout << "Congrats " << winner->getName() << std::endl;
+            gui->showGameOverWindow(winner);
 
             for (auto cell : gui->gameLogic->getWinningCells()) {
                 GtkWidget *winningCell = gtk_grid_get_child_at(GTK_GRID(gui->playGrid),
@@ -390,12 +413,7 @@ gboolean Gui::drawWinStroke(GtkWidget *widget, cairo_t *cr, gpointer data) {
 void Gui::startButtonClickedCB(GtkWidget *widget, gpointer data) {
     auto *gui = static_cast<Gui *>(data);
 
-    delete gui->gameLogic;
-    gui->gameLogic = new GameLogic(gui->gridSizeScaleValue, gui->numberOfCellsInRowToWin,
-                                   gui->player1color, gui->player2color);
-
-    gui->showGameScreen();
-    gui->updateActivePlayerLabel();
+    gui->startNewGame();
 }
 
 void Gui::gridSizeScaleValueChangedCB(GtkRange *range, gpointer data) {
@@ -417,6 +435,26 @@ void Gui::colorButtonColorSetCB(GtkColorButton *widget, gpointer data) {
     GdkRGBA color{};
     gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(widget), &color);
     *target = gdk_rgba_to_string(&color);
+}
+
+void Gui::gameOverDialogResponseCB(GtkDialog *dialog, gint responseId, gpointer data) {
+    auto *gui = static_cast<Gui *>(data);
+
+    switch (responseId) {
+        case GTK_RESPONSE_YES:
+            gtk_window_close(GTK_WINDOW(dialog));
+            gui->showHomeScreen();
+            break;
+        case GTK_RESPONSE_NO:
+            gtk_window_close(GTK_WINDOW(dialog));
+            gui->startNewGame();
+            break;
+        case GTK_RESPONSE_CLOSE:
+            gtk_window_close(GTK_WINDOW(dialog));
+            break;
+        default:
+            break;
+    }
 }
 
 // Menu items callbacks
