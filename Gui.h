@@ -25,6 +25,8 @@ private:
 
     unsigned int gridSizeScaleValue = DEFAULT_GRID_SIZE;
     unsigned int numberOfCellsInRowToWin = DEFAULT_NUMBER_OF_CELLS_IN_ROW_TO_WIN;
+    std::string player1color = PLAYER1_DEFAULT_COLOR;
+    std::string player2color = PLAYER2_DEFAULT_COLOR;
 
     void createMainWindow();
 
@@ -74,6 +76,8 @@ private:
     static void gridSizeScaleValueChangedCB(GtkRange *range, gpointer data);
 
     static void numberOfCellsInRowToWinButtonToggledCB(GtkToggleButton *toggleButton, gpointer data);
+
+    static void colorButtonColorSetCB(GtkColorButton *widget, gpointer data);
 
     // Menu items callbacks
 

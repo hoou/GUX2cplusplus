@@ -15,6 +15,18 @@ GameLogic::GameLogic(unsigned int gridSize, unsigned int numberOfCellsInRowToWin
     initWinSymbolSequenceVector();
 }
 
+GameLogic::GameLogic(unsigned int gridSize, unsigned int numberOfCellsInRowToWin, std::string player1color,
+                     std::string player2color) : gridSize(gridSize),
+                                                 numberOfCellsInRowToWin(
+                                                         numberOfCellsInRowToWin){
+
+    players[0].setColor(player1color);
+    players[1].setColor(player2color);
+
+    initCells();
+    initWinSymbolSequenceVector();
+}
+
 GameLogic::~GameLogic() {
     for (auto row = cells.begin(); row < cells.end(); row++) {
         for (auto col = (*row).begin(); col < (*row).end(); col++) {
@@ -241,5 +253,5 @@ Player *GameLogic::getWinner() {
 }
 
 const std::vector<Cell *> &GameLogic::getWinningCells() const {
-    return winningCells;
-}
+        return winningCells;
+    }

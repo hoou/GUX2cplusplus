@@ -24,6 +24,10 @@ public:
     CellValue getSymbol() const;
 
     const std::string &getColor() const;
+
+    // Setters
+
+    void setColor(const std::string &color);
 };
 
 

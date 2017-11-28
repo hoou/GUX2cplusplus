@@ -39,7 +39,7 @@ void Gui::createLayoutContainer() {
 }
 
 void Gui::createHomeScreen() {
-    GtkWidget *box, *image, *optionsBox, *gridSizeOptionsBox, *numberOfCellsInRowToWinOptionsBox, *scale, *label, *button, *buttonBox;
+    GtkWidget *box, *image, *optionsBox, *colorOptionsBox, *gridSizeOptionsBox, *numberOfCellsInRowToWinOptionsBox, *scale, *label, *button, *buttonBox, *vbox;
     GSList *group;
 
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
@@ -91,6 +91,31 @@ void Gui::createHomeScreen() {
 
     numberOfCellsInRowToWin = DEFAULT_NUMBER_OF_CELLS_IN_ROW_TO_WIN;
 
+    // COLORS
+    colorOptionsBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 30);
+    gtk_widget_set_halign(colorOptionsBox, GTK_ALIGN_CENTER);
+    GdkRGBA color{};
+
+    // PLAYER 1 COLORS
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    label = gtk_label_new("Player 1 color");
+    gdk_rgba_parse(&color, PLAYER1_DEFAULT_COLOR);
+    button = gtk_color_button_new_with_rgba(&color);
+    g_signal_connect(button, "color-set", G_CALLBACK(colorButtonColorSetCB), &player1color);
+    gtk_box_pack_start(GTK_BOX(vbox), label, false, false, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), button, false, false, 0);
+    gtk_box_pack_start(GTK_BOX(colorOptionsBox), vbox, false, false, 0);
+
+    // PLAYER 2 COLORS
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    label = gtk_label_new("Player 2 color");
+    gdk_rgba_parse(&color, PLAYER2_DEFAULT_COLOR);
+    button = gtk_color_button_new_with_rgba(&color);
+    g_signal_connect(button, "color-set", G_CALLBACK(colorButtonColorSetCB), &player2color);
+    gtk_box_pack_start(GTK_BOX(vbox), label, false, false, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), button, false, false, 0);
+    gtk_box_pack_start(GTK_BOX(colorOptionsBox), vbox, false, false, 0);
+
     // START BUTTON
     button = gtk_button_new_with_label("START");
     g_signal_connect(button, "clicked", G_CALLBACK(startButtonClickedCB), this);
@@ -99,6 +124,7 @@ void Gui::createHomeScreen() {
 
     gtk_box_pack_start(GTK_BOX(box), image, false, false, 0);
     gtk_box_pack_start(GTK_BOX(box), optionsBox, false, false, 0);
+    gtk_box_pack_start(GTK_BOX(box), colorOptionsBox, false, false, 0);
     gtk_box_pack_start(GTK_BOX(box), buttonBox, false, false, 0);
 
     homeScreen = box;
@@ -363,7 +389,8 @@ void Gui::startButtonClickedCB(GtkWidget *widget, gpointer data) {
     auto *gui = static_cast<Gui *>(data);
 
     delete gui->gameLogic;
-    gui->gameLogic = new GameLogic(gui->gridSizeScaleValue, gui->numberOfCellsInRowToWin);
+    gui->gameLogic = new GameLogic(gui->gridSizeScaleValue, gui->numberOfCellsInRowToWin,
+                                   gui->player1color, gui->player2color);
 
     gui->showGameScreen();
     gui->updateActivePlayerLabel();
@@ -381,6 +408,13 @@ void Gui::numberOfCellsInRowToWinButtonToggledCB(GtkToggleButton *toggleButton, 
     if (gtk_toggle_button_get_active(toggleButton)) {
         gui->numberOfCellsInRowToWin = static_cast<unsigned int>(atoi(gtk_button_get_label(GTK_BUTTON(toggleButton))));
     }
+}
+
+void Gui::colorButtonColorSetCB(GtkColorButton *widget, gpointer data) {
+    auto *target = static_cast<std::string *>(data);
+    GdkRGBA color{};
+    gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(widget), &color);
+    *target = gdk_rgba_to_string(&color);
 }
 
 // Menu items callbacks

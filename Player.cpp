@@ -24,3 +24,7 @@ const std::string &Player::getColor() const {
     return color;
 }
 
+void Player::setColor(const std::string &color) {
+    Player::color = color;
+}
+
