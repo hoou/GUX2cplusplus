@@ -11,7 +11,7 @@ Gui::Gui(int argc, char **argv) : argc(argc), argv(argv) {
 
 void Gui::initGui() {
     createMainWindow();
-    createLayoutGrid();
+    createLayoutContainer();
 
     showHomeScreen();
 }
@@ -27,9 +27,9 @@ void Gui::createMainWindow() {
     g_signal_connect(mainWindow, "destroy", G_CALLBACK(destroyMainWindowCB), this);
 }
 
-void Gui::createLayoutGrid() {
-    layoutGrid = gtk_grid_new();
-    gtk_container_add(GTK_CONTAINER(mainWindow), layoutGrid);
+void Gui::createLayoutContainer() {
+    layoutContainer = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_add(GTK_CONTAINER(mainWindow), layoutContainer);
 }
 
 void Gui::createHomeScreen() {
@@ -112,7 +112,8 @@ void Gui::createMenuBar() {
     g_signal_connect(newGameMenuItem, "activate", G_CALLBACK(newGameMenuItemActivateCB), this);
 
     menuBarBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
-    gtk_box_pack_start(GTK_BOX(menuBarBox), menuBar, FALSE, FALSE, 0);
+
+    gtk_box_pack_start(GTK_BOX(menuBarBox), menuBar, true, true, 0);
 }
 
 void Gui::createPlayGrid() {
@@ -143,36 +144,59 @@ void Gui::createPlayGrid() {
             gtk_grid_attach(GTK_GRID(playGrid), overlay, row, col, 1, 1);
         }
     }
-
-
 }
 
-void Gui::hideAllWidgetsInLayoutGrid() {
-    gtk_container_foreach(GTK_CONTAINER(layoutGrid), (GtkCallback) hideWidget, this);
+void Gui::createStatusBar() {
+    GtkWidget *label, *box;
+
+    statusBar = gtk_frame_new("Game status");
+
+    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    gtk_container_add(GTK_CONTAINER(statusBar), box);
+
+    label = gtk_label_new("Active player: ");
+    activePlayerLabel = gtk_label_new("");
+
+    gtk_box_pack_start(GTK_BOX(box), label, false, false, 0);
+    gtk_box_pack_start(GTK_BOX(box), activePlayerLabel, false, false, 0);
+}
+
+void Gui::removeAllChildrenFromLayoutContainer() {
+    gtk_container_foreach(GTK_CONTAINER(layoutContainer), (GtkCallback) removeWidget, this);
 }
 
 void Gui::showHomeScreen() {
-    hideAllWidgetsInLayoutGrid();
+    removeAllChildrenFromLayoutContainer();
 
     createHomeScreen();
-    gtk_grid_attach(GTK_GRID(layoutGrid), homeScreen, 0, 0, 1, 1);
+    gtk_box_pack_start(GTK_BOX(layoutContainer), homeScreen, false, false, 0);
 
     gtk_widget_show_all(mainWindow);
 }
 
-void Gui::showPlayGrid() {
+void Gui::showGameScreen() {
     GtkWidget *aspectFrame;
 
-    hideAllWidgetsInLayoutGrid();
+    removeAllChildrenFromLayoutContainer();
 
     createMenuBar();
     createPlayGrid();
+    createStatusBar();
 
     aspectFrame = gtk_aspect_frame_new(nullptr, 0.5, 0.5, 1, false);
     gtk_container_add(GTK_CONTAINER(aspectFrame), playGrid);
 
-    gtk_grid_attach(GTK_GRID(layoutGrid), menuBarBox, 0, 0, 1, 1);
-    gtk_grid_attach(GTK_GRID(layoutGrid), aspectFrame, 0, 1, 1, 1);
+    gtk_widget_set_vexpand(statusBar, false);
+    gtk_widget_set_hexpand(statusBar, false);
+
+    gtk_box_pack_start(GTK_BOX(layoutContainer), menuBarBox, false, false, 0);
+    gtk_box_pack_start(GTK_BOX(layoutContainer), aspectFrame, true, true, 0);
+    gtk_box_pack_start(GTK_BOX(layoutContainer), statusBar, false, false, 0);
+
+    gtk_widget_set_margin_top(statusBar, 20);
+    gtk_widget_set_margin_bottom(statusBar, 20);
+    gtk_widget_set_margin_start(statusBar, 20);
+    gtk_widget_set_margin_end(statusBar, 20);
 
     gtk_widget_show_all(mainWindow);
 }
@@ -198,10 +222,10 @@ void Gui::redrawButton(GtkWidget *widget) {
     gtk_button_set_label(GTK_BUTTON(widget), cell->getStringValue().c_str());
 }
 
-void Gui::hideWidget(GtkWidget *widget, gpointer data) {
+void Gui::removeWidget(GtkWidget *widget, gpointer data) {
     auto *gui = static_cast<Gui *>(data);
 
-    gtk_container_remove(GTK_CONTAINER(gui->layoutGrid), widget);
+    gtk_container_remove(GTK_CONTAINER(gui->layoutContainer), widget);
 }
 
 // CALLBACKS
@@ -245,7 +269,16 @@ void Gui::playGridButtonClickedCB(GtkWidget *widget, gpointer data) {
         }
 
         gtk_widget_set_sensitive(widget, false);
+
+        gui->updateActivePlayerLabel();
     }
+}
+
+void Gui::updateActivePlayerLabel() {
+    std::string name = gameLogic->getActivePlayer()->getName();
+    std::string symbol = Cell::convertValueToString(gameLogic->getActivePlayer()->getSymbol());
+
+    gtk_label_set_text(GTK_LABEL(activePlayerLabel), (name + " [" + symbol + "]").c_str());
 }
 
 gboolean Gui::drawWinStroke(GtkWidget *widget, cairo_t *cr, gpointer data) {
@@ -299,7 +332,8 @@ void Gui::startButtonClickedCB(GtkWidget *widget, gpointer data) {
     delete gui->gameLogic;
     gui->gameLogic = new GameLogic(gui->gridSizeScaleValue, gui->numberOfCellsInRowToWin);
 
-    gui->showPlayGrid();
+    gui->showGameScreen();
+    gui->updateActivePlayerLabel();
 }
 
 void Gui::gridSizeScaleValueChangedCB(GtkRange *range, gpointer data) {

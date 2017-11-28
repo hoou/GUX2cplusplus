@@ -8,8 +8,6 @@
 #include <gtk/gtk.h>
 #include "GameLogic.h"
 
-#define MIN_BUTTON_SIZE 30
-
 class Gui {
 private:
     int argc;
@@ -18,17 +16,19 @@ private:
 
     GtkApplication *gtkApplication;
     GtkWidget *mainWindow;
-    GtkWidget *layoutGrid;
+    GtkWidget *layoutContainer;
     GtkWidget *homeScreen;
     GtkWidget *playGrid;
     GtkWidget *menuBarBox;
+    GtkWidget *statusBar;
+    GtkWidget *activePlayerLabel;
 
     unsigned int gridSizeScaleValue = DEFAULT_GRID_SIZE;
     unsigned int numberOfCellsInRowToWin = DEFAULT_NUMBER_OF_CELLS_IN_ROW_TO_WIN;
 
     void createMainWindow();
 
-    void createLayoutGrid();
+    void createLayoutContainer();
 
     void createHomeScreen();
 
@@ -36,9 +36,11 @@ private:
 
     void createPlayGrid();
 
+    void createStatusBar();
+
     void showHomeScreen();
 
-    void showPlayGrid();
+    void showGameScreen();
 
     void initGui();
 
@@ -46,9 +48,11 @@ private:
 
     void getButtonIndices(GtkWidget *widget, unsigned long *row, unsigned long *col);
 
-    void hideAllWidgetsInLayoutGrid();
+    void removeAllChildrenFromLayoutContainer();
 
-    static void hideWidget(GtkWidget *widget, gpointer data);
+    static void removeWidget(GtkWidget *widget, gpointer data);
+
+    void updateActivePlayerLabel();
 
     // Callbacks
     static void activateApplicationCB(GtkApplication *app, gpointer data);
