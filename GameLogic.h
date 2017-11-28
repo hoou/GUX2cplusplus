@@ -25,8 +25,8 @@ private:
     unsigned int gridSize = DEFAULT_GRID_SIZE;
     unsigned int numberOfCellsInRowToWin = DEFAULT_NUMBER_OF_CELLS_IN_ROW_TO_WIN;
     std::vector<std::vector<Cell *>> cells;
-    Player players[NUMBER_OF_PLAYERS]{{PLAYER1_DEFAULT_NAME, X, PLAYER1_DEFAULT_COLOR},
-                                      {PLAYER2_DEFAULT_NAME, O, PLAYER2_DEFAULT_COLOR}};
+    Player players[NUMBER_OF_PLAYERS]{{PLAYER1_DEFAULT_NAME, O, PLAYER1_DEFAULT_COLOR},
+                                      {PLAYER2_DEFAULT_NAME, X, PLAYER2_DEFAULT_COLOR}};
     std::vector<std::string> winSymbolSequenceVector;
     unsigned short activePlayerIndex = 0;
     bool gameRunning = true;
