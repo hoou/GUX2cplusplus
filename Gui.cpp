@@ -101,6 +101,7 @@ void Gui::createHomeScreen() {
     label = gtk_label_new("Player 1 color");
     gdk_rgba_parse(&color, PLAYER1_DEFAULT_COLOR);
     button = gtk_color_button_new_with_rgba(&color);
+    player1color = PLAYER1_DEFAULT_COLOR;
     g_signal_connect(button, "color-set", G_CALLBACK(colorButtonColorSetCB), &player1color);
     gtk_box_pack_start(GTK_BOX(vbox), label, false, false, 0);
     gtk_box_pack_start(GTK_BOX(vbox), button, false, false, 0);
@@ -112,6 +113,7 @@ void Gui::createHomeScreen() {
     gdk_rgba_parse(&color, PLAYER2_DEFAULT_COLOR);
     button = gtk_color_button_new_with_rgba(&color);
     g_signal_connect(button, "color-set", G_CALLBACK(colorButtonColorSetCB), &player2color);
+    player2color = PLAYER2_DEFAULT_COLOR;
     gtk_box_pack_start(GTK_BOX(vbox), label, false, false, 0);
     gtk_box_pack_start(GTK_BOX(vbox), button, false, false, 0);
     gtk_box_pack_start(GTK_BOX(colorOptionsBox), vbox, false, false, 0);
