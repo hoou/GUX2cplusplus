@@ -1,23 +1,18 @@
 //
-// Created by hoou on 25.11.17.
-//
 
 #include "GameLogic.h"
 #include <iostream>
+
+GameLogic::GameLogic() {
+    initCells();
+    initWinSymbolSequenceVector();
+}
 
 GameLogic::GameLogic(unsigned int gridSize, unsigned int numberOfCellsInRowToWin) : gridSize(gridSize),
                                                                                     numberOfCellsInRowToWin(
                                                                                             numberOfCellsInRowToWin) {
     initCells();
-
-    for (const auto &player : players) {
-        std::string winSymbolSequence;
-        for (int i = 0; i < numberOfCellsInRowToWin; i++) {
-            winSymbolSequence.append(Cell::convertValueToString(player.getSymbol()));
-        }
-
-        winSymbolSequenceVector.push_back(winSymbolSequence);
-    }
+    initWinSymbolSequenceVector();
 }
 
 GameLogic::~GameLogic() {
@@ -36,6 +31,17 @@ void GameLogic::initCells() {
             rowVector.push_back(new Cell(row, col));
         }
         cells.push_back(rowVector);
+    }
+}
+
+void GameLogic::initWinSymbolSequenceVector() {
+    for (const auto &player : players) {
+        std::__cxx11::string winSymbolSequence;
+        for (int i = 0; i < numberOfCellsInRowToWin; i++) {
+            winSymbolSequence.append(Cell::convertValueToString(player.getSymbol()));
+        }
+
+        winSymbolSequenceVector.push_back(winSymbolSequence);
     }
 }
 

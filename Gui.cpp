@@ -1,8 +1,7 @@
 #include <iostream>
 #include "Gui.h"
 
-Gui::Gui(int argc, char **argv, GameLogic *gameLogic) : argc(argc), argv(argv), gameLogic(gameLogic) {
-
+Gui::Gui(int argc, char **argv) : argc(argc), argv(argv) {
     gtkApplication = gtk_application_new("cz.vutbr.fit.stud.xmikit01.piskvorky", G_APPLICATION_FLAGS_NONE);
 
     // When g_application_run() called, function activate() will be called also
@@ -12,7 +11,9 @@ Gui::Gui(int argc, char **argv, GameLogic *gameLogic) : argc(argc), argv(argv), 
 
 void Gui::initGui() {
     createMainWindow();
-    createPlayGrid();
+    createLayoutGrid();
+
+    showHomeScreen();
 }
 
 int Gui::run() {
@@ -23,18 +24,101 @@ void Gui::createMainWindow() {
     mainWindow = gtk_application_window_new(gtkApplication);
     gtk_window_set_title(GTK_WINDOW(mainWindow), "Piskvorky");
 
-    int minWindowSize = MIN_BUTTON_SIZE * gameLogic->getGridSize();
-
-    gtk_window_set_default_size(GTK_WINDOW(mainWindow), minWindowSize, minWindowSize);
-
     // Set minimum size of the main window and aspect ratio to 1:1
     GdkGeometry hints{};
-    hints.min_width = hints.min_height = minWindowSize;
     hints.min_aspect = hints.max_aspect = 1;
 
     gtk_window_set_geometry_hints(GTK_WINDOW(mainWindow), mainWindow, &hints, GDK_HINT_ASPECT);
 
     g_signal_connect(mainWindow, "destroy", G_CALLBACK(destroyMainWindowCB), this);
+}
+
+void Gui::createLayoutGrid() {
+    layoutGrid = gtk_grid_new();
+    gtk_container_add(GTK_CONTAINER(mainWindow), layoutGrid);
+}
+
+void Gui::createHomeScreen() {
+    GtkWidget *box, *image, *optionsBox, *gridSizeOptionsBox, *numberOfCellsInRowToWinOptionsBox, *scale, *label, *button, *buttonBox;
+    GSList *group;
+
+    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
+    gtk_widget_set_margin_start(box, 30);
+    gtk_widget_set_margin_end(box, 30);
+    gtk_widget_set_margin_bottom(box, 30);
+    gtk_widget_set_hexpand(box, true);
+
+    // IMAGE
+    image = gtk_image_new_from_file("assets/piskvorky.png");
+
+    // OPTIONS
+    optionsBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 50);
+    gtk_widget_set_halign(optionsBox, GTK_ALIGN_CENTER);
+
+    // GRID SIZE
+    gridSizeOptionsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_box_pack_start(GTK_BOX(optionsBox), gridSizeOptionsBox, false, false, 0);
+
+    label = gtk_label_new("Grid size");
+    gtk_box_pack_start(GTK_BOX(gridSizeOptionsBox), label, false, false, 0);
+
+    scale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, MIN_GRID_SIZE, MAX_GRID_SIZE, 1);
+    gtk_range_set_value(GTK_RANGE(scale), DEFAULT_GRID_SIZE);
+    g_signal_connect(scale, "value-changed", G_CALLBACK(gridSizeScaleValueChangedCB), this);
+    gridSizeScaleValue = DEFAULT_GRID_SIZE;
+    gtk_box_pack_start(GTK_BOX(gridSizeOptionsBox), scale, true, true, 0);
+
+    // NUMBER OF CELLS IN ROW TO WIN
+    numberOfCellsInRowToWinOptionsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_box_pack_start(GTK_BOX(optionsBox), numberOfCellsInRowToWinOptionsBox, false, false, 0);
+
+    label = gtk_label_new("Number of cells in row to win");
+    gtk_box_pack_start(GTK_BOX(numberOfCellsInRowToWinOptionsBox), label, false, false, 0);
+
+    button = gtk_radio_button_new_with_label(nullptr, "3");
+    g_signal_connect(button, "toggled", G_CALLBACK(numberOfCellsInRowToWinButtonToggledCB), this);
+    gtk_box_pack_start(GTK_BOX(numberOfCellsInRowToWinOptionsBox), button, true, true, 0);
+
+    group = gtk_radio_button_get_group(GTK_RADIO_BUTTON (button));
+    button = gtk_radio_button_new_with_label(group, "4");
+    g_signal_connect(button, "toggled", G_CALLBACK(numberOfCellsInRowToWinButtonToggledCB), this);
+    gtk_box_pack_start(GTK_BOX(numberOfCellsInRowToWinOptionsBox), button, true, true, 0);
+
+    group = gtk_radio_button_get_group(GTK_RADIO_BUTTON (button));
+    button = gtk_radio_button_new_with_label(group, "5");
+    g_signal_connect(button, "toggled", G_CALLBACK(numberOfCellsInRowToWinButtonToggledCB), this);
+    gtk_box_pack_start(GTK_BOX(numberOfCellsInRowToWinOptionsBox), button, true, true, 0);
+
+    numberOfCellsInRowToWin = DEFAULT_NUMBER_OF_CELLS_IN_ROW_TO_WIN;
+
+    // START BUTTON
+    button = gtk_button_new_with_label("START");
+    g_signal_connect(button, "clicked", G_CALLBACK(startButtonClickedCB), this);
+    buttonBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_container_add(GTK_CONTAINER(buttonBox), button);
+
+    gtk_box_pack_start(GTK_BOX(box), image, false, false, 0);
+    gtk_box_pack_start(GTK_BOX(box), optionsBox, false, false, 0);
+    gtk_box_pack_start(GTK_BOX(box), buttonBox, false, false, 0);
+
+    homeScreen = box;
+}
+
+void Gui::createMenuBar() {
+    GtkWidget *fileMenu, *fileMenuItem, *newGameMenuItem, *menuBar;
+
+    menuBar = gtk_menu_bar_new();
+
+    fileMenu = gtk_menu_new();
+    fileMenuItem = gtk_menu_item_new_with_label("File");
+    newGameMenuItem = gtk_menu_item_new_with_label("New game");
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(fileMenuItem), fileMenu);
+    gtk_menu_shell_append(GTK_MENU_SHELL(fileMenu), newGameMenuItem);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menuBar), fileMenuItem);
+    g_signal_connect(newGameMenuItem, "activate", G_CALLBACK(newGameMenuItemActivateCB), this);
+
+    menuBarBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+    gtk_box_pack_start(GTK_BOX(menuBarBox), menuBar, FALSE, FALSE, 0);
 }
 
 void Gui::createPlayGrid() {
@@ -44,8 +128,6 @@ void Gui::createPlayGrid() {
 
     gtk_grid_set_column_homogeneous(GTK_GRID(playGrid), true);
     gtk_grid_set_row_homogeneous(GTK_GRID(playGrid), true);
-
-    gtk_container_add(GTK_CONTAINER(mainWindow), playGrid);
 
     for (int row = 0; row < gameLogic->getGridSize(); row++) {
         for (int col = 0; col < gameLogic->getGridSize(); col++) {
@@ -71,6 +153,31 @@ void Gui::createPlayGrid() {
 
 }
 
+void Gui::hideAllWidgetsInLayoutGrid() {
+    gtk_container_foreach(GTK_CONTAINER(layoutGrid), (GtkCallback) hideWidget, this);
+}
+
+void Gui::showHomeScreen() {
+    hideAllWidgetsInLayoutGrid();
+
+    createHomeScreen();
+    gtk_grid_attach(GTK_GRID(layoutGrid), homeScreen, 0, 0, 1, 1);
+
+    gtk_widget_show_all(mainWindow);
+}
+
+void Gui::showPlayGrid() {
+    hideAllWidgetsInLayoutGrid();
+
+    createMenuBar();
+    createPlayGrid();
+
+    gtk_grid_attach(GTK_GRID(layoutGrid), menuBarBox, 0, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(layoutGrid), playGrid, 0, 1, 1, 1);
+
+    gtk_widget_show_all(mainWindow);
+}
+
 void Gui::getButtonIndices(GtkWidget *widget, unsigned long *row, unsigned long *col) {
     gint left, top;
 
@@ -90,6 +197,12 @@ void Gui::redrawButton(GtkWidget *widget) {
     Cell *cell = gameLogic->getCell(row, col);
 
     gtk_button_set_label(GTK_BUTTON(widget), cell->getStringValue().c_str());
+}
+
+void Gui::hideWidget(GtkWidget *widget, gpointer data) {
+    auto *gui = static_cast<Gui *>(data);
+
+    gtk_container_remove(GTK_CONTAINER(gui->layoutGrid), widget);
 }
 
 // CALLBACKS
@@ -179,4 +292,34 @@ gboolean Gui::drawWinStroke(GtkWidget *widget, cairo_t *cr, gpointer data) {
 
     cairo_stroke(cr);
     return false;
+}
+
+void Gui::startButtonClickedCB(GtkWidget *widget, gpointer data) {
+    auto *gui = static_cast<Gui *>(data);
+
+    delete gui->gameLogic;
+    gui->gameLogic = new GameLogic(gui->gridSizeScaleValue, gui->numberOfCellsInRowToWin);
+
+    gui->showPlayGrid();
+}
+
+void Gui::gridSizeScaleValueChangedCB(GtkRange *range, gpointer data) {
+    auto *gui = static_cast<Gui *>(data);
+
+    gui->gridSizeScaleValue = static_cast<unsigned int>(gtk_range_get_value(range));
+}
+
+void Gui::numberOfCellsInRowToWinButtonToggledCB(GtkToggleButton *toggleButton, gpointer data) {
+    auto *gui = static_cast<Gui *>(data);
+
+    if (gtk_toggle_button_get_active(toggleButton)) {
+        gui->numberOfCellsInRowToWin = static_cast<unsigned int>(atoi(gtk_button_get_label(GTK_BUTTON(toggleButton))));
+    }
+}
+
+// Menu items callbacks
+void Gui::newGameMenuItemActivateCB(GtkWidget *widget, gpointer data) {
+    auto *gui = static_cast<Gui *>(data);
+
+    gui->showHomeScreen();
 }

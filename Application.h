@@ -12,10 +12,9 @@
 class Application {
 private:
     Gui *gui;
-    GameLogic *gameLogic;
 
 public:
-    Application(int argc, char *argv[], unsigned int gridSize, unsigned int numberOfCellsInRowToWin);
+    Application(int argc, char *argv[]);
 
     ~Application();
 

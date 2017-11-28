@@ -4,14 +4,12 @@
 
 #include "Application.h"
 
-Application::Application(int argc, char *argv[], unsigned int gridSize, unsigned int numberOfCellsInRowToWin) {
-    gameLogic = new GameLogic(gridSize, numberOfCellsInRowToWin);
-    gui = new Gui(argc, argv, gameLogic);
+Application::Application(int argc, char *argv[]) {
+    gui = new Gui(argc, argv);
 }
 
 Application::~Application() {
     delete gui;
-    delete gameLogic;
 }
 
 int Application::run() {

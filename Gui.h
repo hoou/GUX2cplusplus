@@ -18,17 +18,37 @@ private:
 
     GtkApplication *gtkApplication;
     GtkWidget *mainWindow;
+    GtkWidget *layoutGrid;
+    GtkWidget *homeScreen;
     GtkWidget *playGrid;
+    GtkWidget *menuBarBox;
+
+    unsigned int gridSizeScaleValue = DEFAULT_GRID_SIZE;
+    unsigned int numberOfCellsInRowToWin = DEFAULT_NUMBER_OF_CELLS_IN_ROW_TO_WIN;
 
     void createMainWindow();
 
+    void createLayoutGrid();
+
+    void createHomeScreen();
+
+    void createMenuBar();
+
     void createPlayGrid();
+
+    void showHomeScreen();
+
+    void showPlayGrid();
 
     void initGui();
 
     void redrawButton(GtkWidget *widget);
 
     void getButtonIndices(GtkWidget *widget, unsigned long *row, unsigned long *col);
+
+    void hideAllWidgetsInLayoutGrid();
+
+    static void hideWidget(GtkWidget *widget, gpointer data);
 
     // Callbacks
     static void activateApplicationCB(GtkApplication *app, gpointer data);
@@ -39,9 +59,19 @@ private:
 
     static gboolean drawWinStroke(GtkWidget *widget, cairo_t *cr, gpointer data);
 
+    static void startButtonClickedCB(GtkWidget *widget, gpointer data);
+
+    static void gridSizeScaleValueChangedCB(GtkRange *range, gpointer data);
+
+    static void numberOfCellsInRowToWinButtonToggledCB(GtkToggleButton *toggleButton, gpointer data);
+
+    // Menu items callbacks
+
+    static void newGameMenuItemActivateCB(GtkWidget *widget, gpointer data);
+
 public:
 
-    Gui(int argc, char **argv, GameLogic *gameLogic);
+    Gui(int argc, char **argv);
 
     int run();
 };

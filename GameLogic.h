@@ -11,11 +11,15 @@
 #include "Player.h"
 
 #define NUMBER_OF_PLAYERS 2
+#define MIN_GRID_SIZE 3
+#define MAX_GRID_SIZE 32
+#define DEFAULT_GRID_SIZE 3
+#define DEFAULT_NUMBER_OF_CELLS_IN_ROW_TO_WIN 3
 
 class GameLogic {
 private:
-    unsigned int gridSize;
-    unsigned int numberOfCellsInRowToWin;
+    unsigned int gridSize = DEFAULT_GRID_SIZE;
+    unsigned int numberOfCellsInRowToWin = DEFAULT_NUMBER_OF_CELLS_IN_ROW_TO_WIN;
     std::vector<std::vector<Cell *>> cells;
     Player players[NUMBER_OF_PLAYERS]{{"Player1", X},
                                       {"Player2", O}};
@@ -31,6 +35,8 @@ private:
 
     void initCells();
 
+    void initWinSymbolSequenceVector();
+
     void swapActivePlayer();
 
     bool doWeHaveWinner(unsigned long row, unsigned long col);
@@ -41,7 +47,9 @@ private:
 
 public:
 
-    explicit GameLogic(unsigned int gridSize, unsigned int numberOfCellsInRowToWin);
+    GameLogic();
+
+    GameLogic(unsigned int gridSize, unsigned int numberOfCellsInRowToWin);
 
     virtual ~GameLogic();
 
