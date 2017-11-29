@@ -63,7 +63,7 @@ void Gui::createHomeScreen() {
     gtk_widget_set_hexpand(box, true);
 
     // IMAGE
-    image = gtk_image_new_from_file("assets/piskvorky.png");
+    image = gtk_image_new_from_file("piskvorky.png");
 
     // OPTIONS
     optionsBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 50);
