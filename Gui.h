@@ -46,6 +46,8 @@ private:
 
     void showGameOverWindow(Player *winner);
 
+    void showAboutDialog();
+
     void initGui();
 
     void redrawButton(GtkWidget *widget, std::string color);
@@ -92,6 +94,9 @@ private:
     static void restartGameMenuItemActivateCB(GtkWidget *widget, gpointer data);
 
     static void quitMenuItemActivateCB(GtkWidget *widget, gpointer data);
+
+    static void aboutMenuItemActivateCB(GtkWidget *widget, gpointer data);
+
 public:
 
     Gui(int argc, char **argv);

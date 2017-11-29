@@ -137,23 +137,30 @@ void Gui::createHomeScreen() {
 }
 
 void Gui::createMenuBar() {
-    GtkWidget *gameMenu, *gameMenuItem, *newGameMenuItem, *restartGameMenuItem, *quitMenuItem, *menuBar;
+    GtkWidget *gameMenu, *helpMenu, *gameMenuItem, *helpMenuItem, *newGameMenuItem, *restartGameMenuItem, *quitMenuItem, *menuBar, *aboutMenuItem;
 
     menuBar = gtk_menu_bar_new();
 
     gameMenu = gtk_menu_new();
+    helpMenu = gtk_menu_new();
     gameMenuItem = gtk_menu_item_new_with_label("Game");
+    helpMenuItem = gtk_menu_item_new_with_label("Help");
     newGameMenuItem = gtk_menu_item_new_with_label("New game");
     restartGameMenuItem = gtk_menu_item_new_with_label("Restart game");
     quitMenuItem = gtk_menu_item_new_with_label("Quit");
+    aboutMenuItem = gtk_menu_item_new_with_label("About");
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(gameMenuItem), gameMenu);
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(helpMenuItem), helpMenu);
     gtk_menu_shell_append(GTK_MENU_SHELL(gameMenu), newGameMenuItem);
     gtk_menu_shell_append(GTK_MENU_SHELL(gameMenu), restartGameMenuItem);
     gtk_menu_shell_append(GTK_MENU_SHELL(gameMenu), quitMenuItem);
+    gtk_menu_shell_append(GTK_MENU_SHELL(helpMenu), aboutMenuItem);
     gtk_menu_shell_append(GTK_MENU_SHELL(menuBar), gameMenuItem);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menuBar), helpMenuItem);
     g_signal_connect(newGameMenuItem, "activate", G_CALLBACK(newGameMenuItemActivateCB), this);
     g_signal_connect(restartGameMenuItem, "activate", G_CALLBACK(restartGameMenuItemActivateCB), this);
     g_signal_connect(quitMenuItem, "activate", G_CALLBACK(quitMenuItemActivateCB), this);
+    g_signal_connect(aboutMenuItem, "activate", G_CALLBACK(aboutMenuItemActivateCB), this);
 
     menuBarBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
 
@@ -258,6 +265,21 @@ void Gui::showGameOverWindow(Player *winner) {
     g_signal_connect(gameOverDialog, "response", G_CALLBACK(gameOverDialogResponseCB), this);
 
     gtk_widget_show_all(gameOverDialog);
+}
+
+void Gui::showAboutDialog() {
+    const char *authors[] = {"Tibor Mikita <xmikit01@stud.fit.vutbr.cz>", NULL};
+
+    gtk_show_about_dialog(
+            GTK_WINDOW(mainWindow),
+            "authors", &authors,
+            "comments", "This is basically simple tic-tac-toe game written for school project.",
+            "copyright", "© 2017 Tibor Mikita",
+            "logo-icon-name", NULL,
+            "program-name", "Piskvorky",
+            "version", "1.0",
+            NULL
+    );
 }
 
 void Gui::getButtonIndices(GtkWidget *widget, unsigned long *row, unsigned long *col) {
@@ -484,5 +506,12 @@ void Gui::restartGameMenuItemActivateCB(GtkWidget *widget, gpointer data) {
 
 void Gui::quitMenuItemActivateCB(GtkWidget *widget, gpointer data) {
     auto *gui = static_cast<Gui *>(data);
+
     gui->quit();
+}
+
+void Gui::aboutMenuItemActivateCB(GtkWidget *widget, gpointer data) {
+    auto *gui = static_cast<Gui *>(data);
+
+    gui->showAboutDialog();
 }
