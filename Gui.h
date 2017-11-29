@@ -91,11 +91,14 @@ private:
 
     static void restartGameMenuItemActivateCB(GtkWidget *widget, gpointer data);
 
+    static void quitMenuItemActivateCB(GtkWidget *widget, gpointer data);
 public:
 
     Gui(int argc, char **argv);
 
     int run();
+
+    void quit();
 };
 
 

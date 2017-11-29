@@ -20,6 +20,10 @@ int Gui::run() {
     return g_application_run(G_APPLICATION(gtkApplication), argc, argv);
 }
 
+void Gui::quit() {
+    g_application_quit(G_APPLICATION(gtkApplication));
+}
+
 void Gui::createMainWindow() {
     mainWindow = gtk_application_window_new(gtkApplication);
     gtk_window_set_title(GTK_WINDOW(mainWindow), "Piskvorky");
@@ -133,7 +137,7 @@ void Gui::createHomeScreen() {
 }
 
 void Gui::createMenuBar() {
-    GtkWidget *gameMenu, *gameMenuItem, *newGameMenuItem, *restartGameMenuItem, *menuBar;
+    GtkWidget *gameMenu, *gameMenuItem, *newGameMenuItem, *restartGameMenuItem, *quitMenuItem, *menuBar;
 
     menuBar = gtk_menu_bar_new();
 
@@ -141,12 +145,15 @@ void Gui::createMenuBar() {
     gameMenuItem = gtk_menu_item_new_with_label("Game");
     newGameMenuItem = gtk_menu_item_new_with_label("New game");
     restartGameMenuItem = gtk_menu_item_new_with_label("Restart game");
+    quitMenuItem = gtk_menu_item_new_with_label("Quit");
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(gameMenuItem), gameMenu);
     gtk_menu_shell_append(GTK_MENU_SHELL(gameMenu), newGameMenuItem);
     gtk_menu_shell_append(GTK_MENU_SHELL(gameMenu), restartGameMenuItem);
+    gtk_menu_shell_append(GTK_MENU_SHELL(gameMenu), quitMenuItem);
     gtk_menu_shell_append(GTK_MENU_SHELL(menuBar), gameMenuItem);
     g_signal_connect(newGameMenuItem, "activate", G_CALLBACK(newGameMenuItemActivateCB), this);
     g_signal_connect(restartGameMenuItem, "activate", G_CALLBACK(restartGameMenuItemActivateCB), this);
+    g_signal_connect(quitMenuItem, "activate", G_CALLBACK(quitMenuItemActivateCB), this);
 
     menuBarBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
 
@@ -473,4 +480,9 @@ void Gui::restartGameMenuItemActivateCB(GtkWidget *widget, gpointer data) {
     auto *gui = static_cast<Gui *>(data);
 
     gui->startNewGame();
+}
+
+void Gui::quitMenuItemActivateCB(GtkWidget *widget, gpointer data) {
+    auto *gui = static_cast<Gui *>(data);
+    gui->quit();
 }
