@@ -47,7 +47,7 @@ void GameLogic::initCells() {
 void GameLogic::initWinSymbolSequenceVector() {
     for (const auto &player : players) {
         std::__cxx11::string winSymbolSequence;
-        for (int i = 0; i < numberOfCellsInRowToWin; i++) {
+        for (unsigned int i = 0; i < numberOfCellsInRowToWin; i++) {
             winSymbolSequence.append(Cell::convertValueToString(player.getSymbol()));
         }
 
@@ -132,7 +132,7 @@ bool GameLogic::doWeHaveWinner(unsigned long row, unsigned long col) {
     // Check diagonal
 
     // Say row index is smaller
-    long smallerIndex = row;
+    unsigned long smallerIndex = row;
 
     if (col < smallerIndex)
         smallerIndex = col;
@@ -140,7 +140,7 @@ bool GameLogic::doWeHaveWinner(unsigned long row, unsigned long col) {
     if (smallerIndex > 4)
         smallerIndex = 4;
 
-    for (long i = -smallerIndex; i < (-smallerIndex + smallerIndex + numberOfCellsInRowToWin); i++) {
+    for (long i = -smallerIndex; i < (long)(-smallerIndex + smallerIndex + numberOfCellsInRowToWin); i++) {
         if (row + i >= gridSize || col + i >= gridSize)
             break;
 
@@ -160,7 +160,7 @@ bool GameLogic::doWeHaveWinner(unsigned long row, unsigned long col) {
     // Check opposite diagonal
 
     smallerIndex = row;
-    long colFromEnd = gridSize - col - 1;
+    unsigned long colFromEnd = gridSize - col - 1;
 
     if (colFromEnd < smallerIndex)
         smallerIndex = colFromEnd;
@@ -168,7 +168,7 @@ bool GameLogic::doWeHaveWinner(unsigned long row, unsigned long col) {
     if (smallerIndex > 4)
         smallerIndex = 4;
 
-    for (long i = -smallerIndex; i < (-smallerIndex + smallerIndex + numberOfCellsInRowToWin); i++) {
+    for (long i = -smallerIndex; i < (long)(-smallerIndex + smallerIndex + numberOfCellsInRowToWin); i++) {
         if (row + i >= gridSize || col - i >= gridSize)
             break;
 
@@ -217,7 +217,7 @@ void GameLogic::setupWinningCells() {
             return;
     }
 
-    for (i = 0; i < numberOfCellsInRowToWin; i++) {
+    for (i = 0; i < (int) numberOfCellsInRowToWin; i++) {
         negativei = -i;
         Cell *cell = cells.at(firstWinningCellRow + *rowOffset).at(firstWinningCellCol + *colOffset);
         cell->setWinningCellSequenceDirection(winningCellSequenceDirection);

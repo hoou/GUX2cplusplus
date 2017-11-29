@@ -185,8 +185,8 @@ void Gui::createPlayGrid() {
     gtk_grid_set_column_homogeneous(GTK_GRID(playGrid), true);
     gtk_grid_set_row_homogeneous(GTK_GRID(playGrid), true);
 
-    for (int row = 0; row < gameLogic->getGridSize(); row++) {
-        for (int col = 0; col < gameLogic->getGridSize(); col++) {
+    for (unsigned int row = 0; row < gameLogic->getGridSize(); row++) {
+        for (unsigned int col = 0; col < gameLogic->getGridSize(); col++) {
             button = gtk_button_new();
 
             changeBorderRadiusOfWidget(button, 0);
