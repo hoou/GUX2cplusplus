@@ -89,6 +89,8 @@ private:
 
     static void newGameMenuItemActivateCB(GtkWidget *widget, gpointer data);
 
+    static void restartGameMenuItemActivateCB(GtkWidget *widget, gpointer data);
+
 public:
 
     Gui(int argc, char **argv);

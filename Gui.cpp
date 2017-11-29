@@ -133,17 +133,20 @@ void Gui::createHomeScreen() {
 }
 
 void Gui::createMenuBar() {
-    GtkWidget *fileMenu, *fileMenuItem, *newGameMenuItem, *menuBar;
+    GtkWidget *gameMenu, *gameMenuItem, *newGameMenuItem, *restartGameMenuItem, *menuBar;
 
     menuBar = gtk_menu_bar_new();
 
-    fileMenu = gtk_menu_new();
-    fileMenuItem = gtk_menu_item_new_with_label("File");
+    gameMenu = gtk_menu_new();
+    gameMenuItem = gtk_menu_item_new_with_label("Game");
     newGameMenuItem = gtk_menu_item_new_with_label("New game");
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(fileMenuItem), fileMenu);
-    gtk_menu_shell_append(GTK_MENU_SHELL(fileMenu), newGameMenuItem);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menuBar), fileMenuItem);
+    restartGameMenuItem = gtk_menu_item_new_with_label("Restart game");
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(gameMenuItem), gameMenu);
+    gtk_menu_shell_append(GTK_MENU_SHELL(gameMenu), newGameMenuItem);
+    gtk_menu_shell_append(GTK_MENU_SHELL(gameMenu), restartGameMenuItem);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menuBar), gameMenuItem);
     g_signal_connect(newGameMenuItem, "activate", G_CALLBACK(newGameMenuItemActivateCB), this);
+    g_signal_connect(restartGameMenuItem, "activate", G_CALLBACK(restartGameMenuItemActivateCB), this);
 
     menuBarBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
 
@@ -464,4 +467,10 @@ void Gui::newGameMenuItemActivateCB(GtkWidget *widget, gpointer data) {
     auto *gui = static_cast<Gui *>(data);
 
     gui->showHomeScreen();
+}
+
+void Gui::restartGameMenuItemActivateCB(GtkWidget *widget, gpointer data) {
+    auto *gui = static_cast<Gui *>(data);
+
+    gui->startNewGame();
 }
