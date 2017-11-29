@@ -50,6 +50,8 @@ private:
 
     void initGui();
 
+    void startNewGame();
+
     void redrawButton(GtkWidget *widget, std::string color);
 
     void getButtonIndices(GtkWidget *widget, unsigned long *row, unsigned long *col);
@@ -60,11 +62,14 @@ private:
 
     void updateActivePlayerLabel();
 
+    // CSS modifiers
     void changeFontSizeOfWidget(GtkWidget *widget, unsigned int fontSize);
 
     void changeFontColorOfWidget(GtkWidget *widget, const std::string &color);
 
-    void startNewGame();
+    void changeBorderRadiusOfWidget(GtkWidget *widget, unsigned int radius);
+
+    void changeBorderWidthOfWidget(GtkWidget *widget, unsigned int width);
 
     // Callbacks
     static void activateApplicationCB(GtkApplication *app, gpointer data);

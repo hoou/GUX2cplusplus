@@ -24,6 +24,14 @@ void Gui::quit() {
     g_application_quit(G_APPLICATION(gtkApplication));
 }
 
+void Gui::startNewGame() {
+    delete gameLogic;
+    gameLogic = new GameLogic(gridSizeScaleValue, numberOfCellsInRowToWin, player1color, player2color);
+
+    showGameScreen();
+    updateActivePlayerLabel();
+}
+
 void Gui::createMainWindow() {
     mainWindow = gtk_application_window_new(gtkApplication);
     gtk_window_set_title(GTK_WINDOW(mainWindow), "Piskvorky");
@@ -180,6 +188,10 @@ void Gui::createPlayGrid() {
     for (int row = 0; row < gameLogic->getGridSize(); row++) {
         for (int col = 0; col < gameLogic->getGridSize(); col++) {
             button = gtk_button_new();
+
+            changeBorderRadiusOfWidget(button, 0);
+            changeBorderWidthOfWidget(button, 0);
+
             label = gtk_label_new(" ");
             overlay = gtk_overlay_new();
 
@@ -313,6 +325,7 @@ void Gui::removeWidget(GtkWidget *widget, gpointer data) {
     gtk_container_remove(GTK_CONTAINER(gui->layoutContainer), widget);
 }
 
+// CSS modifiers
 void Gui::changeFontSizeOfWidget(GtkWidget *widget, unsigned int fontSize) {
     GtkCssProvider *provider = gtk_css_provider_new();
     gtk_css_provider_load_from_data(provider, ("* {font-size: " + std::to_string(fontSize) + "px}").c_str(), -1,
@@ -328,12 +341,18 @@ void Gui::changeFontColorOfWidget(GtkWidget *widget, const std::string &color) {
     gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 }
 
-void Gui::startNewGame() {
-    delete gameLogic;
-    gameLogic = new GameLogic(gridSizeScaleValue, numberOfCellsInRowToWin, player1color, player2color);
+void Gui::changeBorderRadiusOfWidget(GtkWidget *widget, unsigned int radius) {
+    GtkCssProvider *provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(provider, ("* {border-radius: " + std::to_string(radius) + "px; }").c_str(), -1, nullptr);
+    GtkStyleContext *context = gtk_widget_get_style_context(widget);
+    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
+}
 
-    showGameScreen();
-    updateActivePlayerLabel();
+void Gui::changeBorderWidthOfWidget(GtkWidget *widget, unsigned int width) {
+    GtkCssProvider *provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(provider, ("* {border-width: " + std::to_string(width) + "px; }").c_str(), -1, nullptr);
+    GtkStyleContext *context = gtk_widget_get_style_context(widget);
+    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 }
 
 // CALLBACKS
