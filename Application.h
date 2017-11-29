@@ -1,7 +1,3 @@
-//
-// Created by hoou on 25.11.17.
-//
-
 #ifndef GUX2CPLUSPLUS_APPLICATION_H
 #define GUX2CPLUSPLUS_APPLICATION_H
 

@@ -1,7 +1,3 @@
-//
-// Created by hoou on 25.11.17.
-//
-
 #include "Application.h"
 
 Application::Application(int argc, char *argv[]) {

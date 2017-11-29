@@ -1,5 +1,3 @@
-//
-
 #include "GameLogic.h"
 #include <iostream>
 

@@ -1,7 +1,3 @@
-//
-// Created by hoou on 27.11.17.
-//
-
 #include "Cell.h"
 
 Cell::Cell(unsigned long row, unsigned long col) : row(row), col(col) {}

@@ -1,7 +1,3 @@
-//
-// Created by hoou on 27.11.17.
-//
-
 #ifndef GUX2CPLUSPLUS_CELL_H
 #define GUX2CPLUSPLUS_CELL_H
 
