@@ -39,3 +39,5 @@
 .idea
 out
 gen
+cmake-build-debug/
+piskvorky
