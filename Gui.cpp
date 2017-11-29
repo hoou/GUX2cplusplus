@@ -47,6 +47,8 @@ void Gui::createHomeScreen() {
     GSList *group;
 
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
+    gtk_widget_set_valign(box, GTK_ALIGN_CENTER);
+    gtk_widget_set_vexpand(box, true);
     gtk_widget_set_margin_start(box, 30);
     gtk_widget_set_margin_end(box, 30);
     gtk_widget_set_margin_bottom(box, 30);
