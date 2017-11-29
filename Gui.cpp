@@ -76,7 +76,7 @@ void Gui::createHomeScreen() {
     numberOfCellsInRowToWinOptionsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_box_pack_start(GTK_BOX(optionsBox), numberOfCellsInRowToWinOptionsBox, false, false, 0);
 
-    label = gtk_label_new("Number of cells in row to win");
+    label = gtk_label_new("Symbols to win");
     gtk_box_pack_start(GTK_BOX(numberOfCellsInRowToWinOptionsBox), label, false, false, 0);
 
     button = gtk_radio_button_new_with_label(nullptr, "3");
@@ -268,7 +268,7 @@ void Gui::showGameOverWindow(Player *winner) {
 }
 
 void Gui::showAboutDialog() {
-    const char *authors[] = {"Tibor Mikita <xmikit01@stud.fit.vutbr.cz>", NULL};
+    const char *authors[] = {"Tibor Mikita <xmikit01@stud.fit.vutbr.cz>", nullptr};
 
     gtk_show_about_dialog(
             GTK_WINDOW(mainWindow),
