@@ -412,7 +412,9 @@ gboolean Gui::drawWinStroke(GtkWidget *widget, cairo_t *cr, gpointer data) {
 
     gtk_render_background(context, cr, 0, 0, width, height);
 
-    cairo_set_line_width(cr, 3);
+    int buttonWidth = gtk_widget_get_allocated_width(widget);
+
+    cairo_set_line_width(cr, (int)(buttonWidth / 10.0));
 
     switch (cell->getWinningCellSequenceDirection()) {
         case Horizontal:
