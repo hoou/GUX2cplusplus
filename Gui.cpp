@@ -184,13 +184,15 @@ void Gui::createPlayGrid() {
 void Gui::createStatusBar() {
     GtkWidget *label, *box;
 
-    statusBar = gtk_frame_new("Game status");
+    statusBar = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
 
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
-    gtk_container_add(GTK_CONTAINER(statusBar), box);
 
-    label = gtk_label_new("Active player: ");
+    gtk_box_pack_start(GTK_BOX(statusBar), box, false, false, 20);
+
+    label = gtk_label_new("On the move: ");
     activePlayerLabel = gtk_label_new("");
+    gtk_widget_set_size_request(activePlayerLabel, 50, 10);
 
     gtk_box_pack_start(GTK_BOX(box), label, false, false, 0);
     gtk_box_pack_start(GTK_BOX(box), activePlayerLabel, false, false, 0);
@@ -228,10 +230,7 @@ void Gui::showGameScreen() {
     gtk_box_pack_start(GTK_BOX(layoutContainer), aspectFrame, true, true, 0);
     gtk_box_pack_start(GTK_BOX(layoutContainer), statusBar, false, false, 0);
 
-    gtk_widget_set_margin_top(statusBar, 20);
-    gtk_widget_set_margin_bottom(statusBar, 20);
-    gtk_widget_set_margin_start(statusBar, 20);
-    gtk_widget_set_margin_end(statusBar, 20);
+    gtk_widget_set_halign(statusBar, GTK_ALIGN_CENTER);
 
     gtk_widget_show_all(mainWindow);
 }
@@ -362,7 +361,10 @@ void Gui::updateActivePlayerLabel() {
     std::string name = gameLogic->getActivePlayer()->getName();
     std::string symbol = Cell::convertValueToString(gameLogic->getActivePlayer()->getSymbol());
 
-    gtk_label_set_text(GTK_LABEL(activePlayerLabel), (name + " [" + symbol + "]").c_str());
+    changeFontColorOfWidget(activePlayerLabel, gameLogic->getActivePlayer()->getColor());
+    changeFontSizeOfWidget(activePlayerLabel, 20);
+
+    gtk_label_set_text(GTK_LABEL(activePlayerLabel), symbol.c_str());
 }
 
 gboolean Gui::drawWinStroke(GtkWidget *widget, cairo_t *cr, gpointer data) {
