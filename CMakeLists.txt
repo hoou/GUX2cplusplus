@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(GUX2cplusplus)
+project(piskvorky)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
@@ -17,7 +17,7 @@ LINK_DIRECTORIES(${GTK3_LIBRARY_DIRS})
 ADD_DEFINITIONS(${GTK3_CFLAGS_OTHER})
 
 set(SOURCE_FILES main.cpp Application.cpp Application.h Gui.cpp Gui.h GameLogic.cpp GameLogic.h Cell.cpp Cell.h Player.cpp Player.h)
-add_executable(GUX2cplusplus ${SOURCE_FILES})
+add_executable(piskvorky ${SOURCE_FILES})
 
 # Link the target to the GTK+ libraries
-TARGET_LINK_LIBRARIES(GUX2cplusplus ${GTK3_LIBRARIES})
+TARGET_LINK_LIBRARIES(piskvorky ${GTK3_LIBRARIES})
