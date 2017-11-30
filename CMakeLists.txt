@@ -16,7 +16,7 @@ LINK_DIRECTORIES(${GTK3_LIBRARY_DIRS})
 # Add other flags to the compiler
 ADD_DEFINITIONS(${GTK3_CFLAGS_OTHER})
 
-set(SOURCE_FILES main.cpp Application.cpp Application.h Gui.cpp Gui.h GameLogic.cpp GameLogic.h Cell.cpp Cell.h Player.cpp Player.h)
+set(SOURCE_FILES main.cpp Application.cpp Application.h Gui.cpp Gui.h GameLogic.cpp GameLogic.h Cell.cpp Cell.h Player.cpp Player.h utils.h)
 add_executable(piskvorky ${SOURCE_FILES})
 
 # Link the target to the GTK+ libraries

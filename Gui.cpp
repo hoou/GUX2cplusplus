@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Gui.h"
+#include "utils.h"
 
 Gui::Gui(int argc, char **argv) : argc(argc), argv(argv) {
     gtkApplication = gtk_application_new("cz.vutbr.fit.stud.xmikit01.piskvorky", G_APPLICATION_FLAGS_NONE);
@@ -328,7 +329,7 @@ void Gui::removeWidget(GtkWidget *widget, gpointer data) {
 // CSS modifiers
 void Gui::changeFontSizeOfWidget(GtkWidget *widget, unsigned int fontSize) {
     GtkCssProvider *provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(provider, ("* {font-size: " + std::to_string(fontSize) + "px}").c_str(), -1,
+    gtk_css_provider_load_from_data(provider, ("* {font-size: " + to_string(fontSize) + "px}").c_str(), -1,
                                     nullptr);
     GtkStyleContext *context = gtk_widget_get_style_context(widget);
     gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
@@ -343,14 +344,14 @@ void Gui::changeFontColorOfWidget(GtkWidget *widget, const std::string &color) {
 
 void Gui::changeBorderRadiusOfWidget(GtkWidget *widget, unsigned int radius) {
     GtkCssProvider *provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(provider, ("* {border-radius: " + std::to_string(radius) + "px; }").c_str(), -1, nullptr);
+    gtk_css_provider_load_from_data(provider, ("* {border-radius: " + to_string(radius) + "px; }").c_str(), -1, nullptr);
     GtkStyleContext *context = gtk_widget_get_style_context(widget);
     gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 }
 
 void Gui::changeBorderWidthOfWidget(GtkWidget *widget, unsigned int width) {
     GtkCssProvider *provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(provider, ("* {border-width: " + std::to_string(width) + "px; }").c_str(), -1, nullptr);
+    gtk_css_provider_load_from_data(provider, ("* {border-width: " + to_string(width) + "px; }").c_str(), -1, nullptr);
     GtkStyleContext *context = gtk_widget_get_style_context(widget);
     gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 }
