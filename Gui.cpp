@@ -330,7 +330,7 @@ void Gui::removeWidget(GtkWidget *widget, gpointer data) {
 // CSS modifiers
 void Gui::changeFontSizeOfWidget(GtkWidget *widget, unsigned int fontSize) {
     GtkCssProvider *provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(provider, ("* {font-size: " + to_string(fontSize) + "px}").c_str(), -1,
+    gtk_css_provider_load_from_data(provider, ("* {font-size: " + to_string(fontSize) + "pt}").c_str(), -1,
                                     nullptr);
     GtkStyleContext *context = gtk_widget_get_style_context(widget);
     gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
@@ -345,14 +345,14 @@ void Gui::changeFontColorOfWidget(GtkWidget *widget, const std::string &color) {
 
 void Gui::changeBorderRadiusOfWidget(GtkWidget *widget, unsigned int radius) {
     GtkCssProvider *provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(provider, ("* {border-radius: " + to_string(radius) + "px; }").c_str(), -1, nullptr);
+    gtk_css_provider_load_from_data(provider, ("* {border-radius: " + to_string(radius) + "pt; }").c_str(), -1, nullptr);
     GtkStyleContext *context = gtk_widget_get_style_context(widget);
     gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 }
 
 void Gui::changeBorderWidthOfWidget(GtkWidget *widget, unsigned int width) {
     GtkCssProvider *provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(provider, ("* {border-width: " + to_string(width) + "px; }").c_str(), -1, nullptr);
+    gtk_css_provider_load_from_data(provider, ("* {border-width: " + to_string(width) + "pt; }").c_str(), -1, nullptr);
     GtkStyleContext *context = gtk_widget_get_style_context(widget);
     gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 }
@@ -407,7 +407,7 @@ void Gui::playGridButtonClickedCB(GtkWidget *widget, gpointer data) {
 void Gui::playGridButtonSizeAllocateCB(GtkWidget *widget, gpointer data) {
     auto *gui = static_cast<Gui *>(data);
 
-    auto fontSize = static_cast<unsigned int>(gtk_widget_get_allocated_width(widget) / 2.0);
+    auto fontSize = static_cast<unsigned int>(gtk_widget_get_allocated_width(widget) / 3.0);
 
     gui->changeFontSizeOfWidget(widget, fontSize);
 }
@@ -417,7 +417,7 @@ void Gui::updateActivePlayerLabel() {
     std::string symbol = Cell::convertValueToString(gameLogic->getActivePlayer()->getSymbol());
 
     changeFontColorOfWidget(activePlayerLabel, gameLogic->getActivePlayer()->getColor());
-    changeFontSizeOfWidget(activePlayerLabel, 20);
+    changeFontSizeOfWidget(activePlayerLabel, 14);
 
     gtk_label_set_text(GTK_LABEL(activePlayerLabel), symbol.c_str());
 }
