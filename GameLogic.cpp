@@ -46,7 +46,7 @@ void GameLogic::initCells() {
 
 void GameLogic::initWinSymbolSequenceVector() {
     for (const auto &player : players) {
-        std::__cxx11::string winSymbolSequence;
+        std::string winSymbolSequence;
         for (unsigned int i = 0; i < numberOfCellsInRowToWin; i++) {
             winSymbolSequence.append(Cell::convertValueToString(player.getSymbol()));
         }
