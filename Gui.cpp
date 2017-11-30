@@ -79,6 +79,7 @@ void Gui::createHomeScreen() {
     gtk_box_pack_start(GTK_BOX(gridSizeOptionsBox), label, false, false, 0);
 
     scale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, MIN_GRID_SIZE, MAX_GRID_SIZE, 1);
+    gtk_widget_set_size_request(scale, 80, 5);
     gtk_range_set_value(GTK_RANGE(scale), DEFAULT_GRID_SIZE);
     g_signal_connect(scale, "value-changed", G_CALLBACK(gridSizeScaleValueChangedCB), this);
     gridSizeScaleValue = DEFAULT_GRID_SIZE;
