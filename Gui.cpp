@@ -192,7 +192,7 @@ void Gui::createPlayGrid() {
             button = gtk_button_new();
 
             changeBorderRadiusOfWidget(button, 0);
-            changeBorderWidthOfWidget(button, 0);
+            changeBorderWidthOfWidget(button, 1);
 
             label = gtk_label_new(" ");
             overlay = gtk_overlay_new();
