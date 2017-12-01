@@ -18,7 +18,7 @@ private:
     GtkWidget *homeScreen;
     GtkWidget *playGrid;
     GtkWidget *menuBarBox;
-    GtkWidget *activePlayerLabel;
+    GtkWidget *onTheMoveDrawingAreaDraw;
     GtkWidget *player1ColorChooseDrawingArea;
     GtkWidget *player2ColorChooseDrawingArea;
 
@@ -54,8 +54,6 @@ private:
     void removeAllChildrenFromLayoutContainer();
 
     static void removeWidget(GtkWidget *widget, gpointer data);
-
-    void updateActivePlayerLabel();
 
     // CSS modifiers
     void changeFontSizeOfWidget(GtkWidget *widget, unsigned int fontSize);
@@ -98,6 +96,8 @@ private:
     static gboolean player1ColorChooseDrawingAreaDrawCB(GtkWidget *widget, cairo_t *cr, gpointer data);
 
     static gboolean player2ColorChooseDrawingAreaDrawCB(GtkWidget *widget, cairo_t *cr, gpointer data);
+
+    static gboolean onTheMoveDrawingAreaDrawCB(GtkWidget *widget, cairo_t *cr, gpointer data);
 
     // Menu items callbacks
 

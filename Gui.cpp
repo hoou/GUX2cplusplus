@@ -32,7 +32,6 @@ void Gui::startNewGame() {
     gameLogic = new GameLogic(gridSizeScaleValue, numberOfCellsInRowToWin, player1color, player2color);
 
     showGameScreen();
-    updateActivePlayerLabel();
 }
 
 void Gui::createMainWindow() {
@@ -162,7 +161,8 @@ void Gui::createHomeScreen() {
 }
 
 void Gui::createMenuBar() {
-    GtkWidget *gameMenu, *helpMenu, *gameMenuItem, *helpMenuItem, *newGameMenuItem, *restartGameMenuItem, *quitMenuItem, *menuBar, *aboutMenuItem;
+    GtkWidget *gameMenu, *helpMenu, *gameMenuItem, *helpMenuItem, *newGameMenuItem, *restartGameMenuItem;
+    GtkWidget *quitMenuItem, *menuBar, *aboutMenuItem;
     GtkWidget *label, *box;
 
     menuBar = gtk_menu_bar_new();
@@ -196,10 +196,11 @@ void Gui::createMenuBar() {
     gtk_widget_set_margin_end(box, 10);
 
     label = gtk_label_new("on the move: ");
-    activePlayerLabel = gtk_label_new("");
-    gtk_widget_set_size_request(activePlayerLabel, 30, -1);
+    onTheMoveDrawingAreaDraw = gtk_drawing_area_new();
+    gtk_widget_set_size_request(onTheMoveDrawingAreaDraw, 30, 30);
+    g_signal_connect(onTheMoveDrawingAreaDraw, "draw", G_CALLBACK(onTheMoveDrawingAreaDrawCB), this);
     gtk_box_pack_start(GTK_BOX(box), label, false, false, 0);
-    gtk_box_pack_start(GTK_BOX(box), activePlayerLabel, false, false, 0);
+    gtk_box_pack_start(GTK_BOX(box), onTheMoveDrawingAreaDraw, false, false, 0);
 
     gtk_box_pack_start(GTK_BOX(menuBarBox), menuBar, false, false, 0);
     gtk_box_pack_start(GTK_BOX(menuBarBox), box, true, true, 0);
@@ -436,7 +437,7 @@ gboolean Gui::playGridCellButtonPressEventCB(GtkWidget *widget, GdkEvent *event,
 
         gtk_widget_set_sensitive(widget, false);
 
-        gui->updateActivePlayerLabel();
+        gtk_widget_queue_draw(gui->onTheMoveDrawingAreaDraw);
     }
 
     return false;
@@ -510,16 +511,6 @@ gboolean Gui::playGridCellDrawCB(GtkWidget *widget, cairo_t *cr, gpointer data) 
     }
 
     return FALSE;
-}
-
-void Gui::updateActivePlayerLabel() {
-    std::string name = gameLogic->getActivePlayer()->getName();
-    std::string symbol = Cell::convertValueToString(gameLogic->getActivePlayer()->getSymbol());
-
-    changeFontColorOfWidget(activePlayerLabel, gameLogic->getActivePlayer()->getColor());
-    changeFontSizeOfWidget(activePlayerLabel, 14);
-
-    gtk_label_set_text(GTK_LABEL(activePlayerLabel), symbol.c_str());
 }
 
 void Gui::startButtonClickedCB(GtkWidget *widget, gpointer data) {
@@ -603,6 +594,31 @@ gboolean Gui::player2ColorChooseDrawingAreaDrawCB(GtkWidget *widget, cairo_t *cr
     gtk_render_background(context, cr, 0, 0, width, height);
 
     gui->drawX(cr, lineWidth, gui->player2color, width, height);
+
+    return false;
+}
+
+gboolean Gui::onTheMoveDrawingAreaDrawCB(GtkWidget *widget, cairo_t *cr, gpointer data) {
+    auto *gui = static_cast<Gui *>(data);
+
+    guint width, height;
+    GtkStyleContext *context;
+
+    context = gtk_widget_get_style_context(widget);
+
+    width = static_cast<guint>(gtk_widget_get_allocated_width(widget));
+    height = static_cast<guint>(gtk_widget_get_allocated_height(widget));
+    auto lineWidth = (unsigned int) (gtk_widget_get_allocated_width(widget) / 10.0);
+
+    gtk_render_background(context, cr, 0, 0, width, height);
+
+    Player *activePlayer = gui->gameLogic->getActivePlayer();
+
+    if (activePlayer->getSymbol() == X) {
+        gui->drawX(cr, lineWidth, activePlayer->getColor(), width, height);
+    } else if (activePlayer->getSymbol() == O) {
+        gui->drawO(cr, lineWidth, activePlayer->getColor(), width, height);
+    }
 
     return false;
 }
