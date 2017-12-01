@@ -19,6 +19,8 @@ private:
     GtkWidget *playGrid;
     GtkWidget *menuBarBox;
     GtkWidget *activePlayerLabel;
+    GtkWidget *player1ColorChooseDrawingArea;
+    GtkWidget *player2ColorChooseDrawingArea;
 
     unsigned int gridSizeScaleValue = DEFAULT_GRID_SIZE;
     unsigned int numberOfCellsInRowToWin = DEFAULT_NUMBER_OF_CELLS_IN_ROW_TO_WIN;
@@ -92,6 +94,10 @@ private:
     static void colorButtonColorSetCB(GtkColorButton *widget, gpointer data);
 
     static void gameOverDialogResponseCB(GtkDialog *dialog, gint responseId, gpointer data);
+
+    static gboolean player1ColorChooseDrawingAreaDrawCB(GtkWidget *widget, cairo_t *cr, gpointer data);
+
+    static gboolean player2ColorChooseDrawingAreaDrawCB(GtkWidget *widget, cairo_t *cr, gpointer data);
 
     // Menu items callbacks
 

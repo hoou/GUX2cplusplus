@@ -49,7 +49,8 @@ void Gui::createLayoutContainer() {
 }
 
 void Gui::createHomeScreen() {
-    GtkWidget *box, *image, *optionsBox, *colorOptionsBox, *gridSizeOptionsBox, *numberOfCellsInRowToWinOptionsBox, *scale, *label, *button, *buttonBox, *vbox;
+    GtkWidget *box, *image, *optionsBox, *colorOptionsBox, *gridSizeOptionsBox, *numberOfCellsInRowToWinOptionsBox;
+    GtkWidget *scale, *label, *button, *buttonBox, *vbox, *hbox;
     GSList *group;
 
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
@@ -111,25 +112,39 @@ void Gui::createHomeScreen() {
     GdkRGBA color{};
 
     // PLAYER 1 COLORS
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     label = gtk_label_new("Player 1 color");
     gdk_rgba_parse(&color, PLAYER1_DEFAULT_COLOR);
     button = gtk_color_button_new_with_rgba(&color);
     player1color = PLAYER1_DEFAULT_COLOR;
     g_signal_connect(button, "color-set", G_CALLBACK(colorButtonColorSetCB), &player1color);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    player1ColorChooseDrawingArea = gtk_drawing_area_new();
+    gtk_widget_set_size_request(player1ColorChooseDrawingArea, 30, 30);
+    gtk_widget_set_halign(hbox, GTK_ALIGN_CENTER);
+    g_signal_connect(player1ColorChooseDrawingArea,"draw", G_CALLBACK(player1ColorChooseDrawingAreaDrawCB), this);
+    gtk_box_pack_start(GTK_BOX(hbox), player1ColorChooseDrawingArea, false, false, 0);
     gtk_box_pack_start(GTK_BOX(vbox), label, false, false, 0);
     gtk_box_pack_start(GTK_BOX(vbox), button, false, false, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, false, false, 0);
     gtk_box_pack_start(GTK_BOX(colorOptionsBox), vbox, false, false, 0);
 
     // PLAYER 2 COLORS
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     label = gtk_label_new("Player 2 color");
     gdk_rgba_parse(&color, PLAYER2_DEFAULT_COLOR);
     button = gtk_color_button_new_with_rgba(&color);
-    g_signal_connect(button, "color-set", G_CALLBACK(colorButtonColorSetCB), &player2color);
     player2color = PLAYER2_DEFAULT_COLOR;
+    g_signal_connect(button, "color-set", G_CALLBACK(colorButtonColorSetCB), &player2color);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    player2ColorChooseDrawingArea = gtk_drawing_area_new();
+    gtk_widget_set_size_request(player2ColorChooseDrawingArea, 30, 30);
+    gtk_widget_set_halign(hbox, GTK_ALIGN_CENTER);
+    g_signal_connect(player2ColorChooseDrawingArea,"draw", G_CALLBACK(player2ColorChooseDrawingAreaDrawCB), this);
+    gtk_box_pack_start(GTK_BOX(hbox), player2ColorChooseDrawingArea, false, false, 0);
     gtk_box_pack_start(GTK_BOX(vbox), label, false, false, 0);
     gtk_box_pack_start(GTK_BOX(vbox), button, false, false, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, false, false, 0);
     gtk_box_pack_start(GTK_BOX(colorOptionsBox), vbox, false, false, 0);
 
     // START BUTTON
@@ -444,7 +459,6 @@ gboolean Gui::playGridCellDrawCB(GtkWidget *widget, cairo_t *cr, gpointer data) 
 
     // Setup line width
     auto lineWidth = (unsigned int) (gtk_widget_get_allocated_width(widget) / 10.0);
-    cairo_set_line_width(cr, lineWidth);
 
     // Get cell information from game logic
     gui->getPlayGridCellIndices(widget, &row, &col);
@@ -553,6 +567,44 @@ void Gui::gameOverDialogResponseCB(GtkDialog *dialog, gint responseId, gpointer 
         default:
             break;
     }
+}
+
+gboolean Gui::player1ColorChooseDrawingAreaDrawCB(GtkWidget *widget, cairo_t *cr, gpointer data) {
+    auto *gui = static_cast<Gui *>(data);
+
+    guint width, height;
+    GtkStyleContext *context;
+
+    context = gtk_widget_get_style_context(widget);
+
+    width = static_cast<guint>(gtk_widget_get_allocated_width(widget));
+    height = static_cast<guint>(gtk_widget_get_allocated_height(widget));
+    auto lineWidth = (unsigned int) (gtk_widget_get_allocated_width(widget) / 10.0);
+
+    gtk_render_background(context, cr, 0, 0, width, height);
+
+    gui->drawX(cr, lineWidth, gui->player1color, width, height);
+
+    return false;
+}
+
+gboolean Gui::player2ColorChooseDrawingAreaDrawCB(GtkWidget *widget, cairo_t *cr, gpointer data) {
+    auto *gui = static_cast<Gui *>(data);
+
+    guint width, height;
+    GtkStyleContext *context;
+
+    context = gtk_widget_get_style_context(widget);
+
+    width = static_cast<guint>(gtk_widget_get_allocated_width(widget));
+    height = static_cast<guint>(gtk_widget_get_allocated_height(widget));
+    auto lineWidth = (unsigned int) (gtk_widget_get_allocated_width(widget) / 10.0);
+
+    gtk_render_background(context, cr, 0, 0, width, height);
+
+    gui->drawO(cr, lineWidth, gui->player2color, width, height);
+
+    return false;
 }
 
 // Menu items callbacks
