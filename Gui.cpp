@@ -106,7 +106,7 @@ void Gui::createHomeScreen() {
     numberOfCellsInRowToWin = DEFAULT_NUMBER_OF_CELLS_IN_ROW_TO_WIN;
 
     // COLORS
-    colorOptionsBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 30);
+    colorOptionsBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 50);
     gtk_widget_set_halign(colorOptionsBox, GTK_ALIGN_CENTER);
     GdkRGBA color{};
 
