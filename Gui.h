@@ -103,6 +103,11 @@ private:
 
     static void aboutMenuItemActivateCB(GtkWidget *widget, gpointer data);
 
+    // Drawing
+    void drawX(cairo_t *cr, unsigned int lineWidth, const std::string &color, unsigned int width, unsigned int height);
+
+    void drawO(cairo_t *cr, unsigned int lineWidth, const std::string &color, unsigned int width, unsigned int height);
+
 public:
 
     Gui(int argc, char **argv);

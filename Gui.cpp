@@ -443,7 +443,7 @@ gboolean Gui::playGridCellDrawCB(GtkWidget *widget, cairo_t *cr, gpointer data) 
     gtk_render_background(context, cr, 0, 0, width, height);
 
     // Setup line width
-    auto lineWidth = (int) (gtk_widget_get_allocated_width(widget) / 10.0);
+    auto lineWidth = (unsigned int) (gtk_widget_get_allocated_width(widget) / 10.0);
     cairo_set_line_width(cr, lineWidth);
 
     // Get cell information from game logic
@@ -453,19 +453,10 @@ gboolean Gui::playGridCellDrawCB(GtkWidget *widget, cairo_t *cr, gpointer data) 
     // If cell not empty, draw X or O
     switch (cell->getValue()) {
         case X:
-            cairo_move_to(cr, 0 + lineWidth, 0 + lineWidth);
-            cairo_line_to(cr, width - lineWidth, height - lineWidth);
-            cairo_move_to(cr, width - lineWidth, 0 + lineWidth);
-            cairo_line_to(cr, 0 + lineWidth, height - lineWidth);
-            gdk_rgba_parse(&color, cell->getColor().c_str());
-            gdk_cairo_set_source_rgba(cr, &color);
-            cairo_stroke(cr);
+            gui->drawX(cr, lineWidth, cell->getColor(), width, height);
             break;
         case O:
-            cairo_arc(cr, width / 2.0, height / 2.0, width / 2.0 - lineWidth, 0.0, 2 * M_PI);
-            gdk_rgba_parse(&color, cell->getColor().c_str());
-            gdk_cairo_set_source_rgba(cr, &color);
-            cairo_stroke(cr);
+            gui->drawO(cr, lineWidth, cell->getColor(), width, height);
             break;
         default:
             break;
@@ -587,4 +578,27 @@ void Gui::aboutMenuItemActivateCB(GtkWidget *widget, gpointer data) {
     auto *gui = static_cast<Gui *>(data);
 
     gui->showAboutDialog();
+}
+
+// Drawing
+
+void
+Gui::drawX(cairo_t *cr, unsigned int lineWidth, const std::string &color, unsigned int width, unsigned int height) {
+    GdkRGBA rgba{};
+    cairo_move_to(cr, 0 + lineWidth, 0 + lineWidth);
+    cairo_line_to(cr, width - lineWidth, height - lineWidth);
+    cairo_move_to(cr, width - lineWidth, 0 + lineWidth);
+    cairo_line_to(cr, 0 + lineWidth, height - lineWidth);
+    gdk_rgba_parse(&rgba, color.c_str());
+    gdk_cairo_set_source_rgba(cr, &rgba);
+    cairo_stroke(cr);
+}
+
+void
+Gui::drawO(cairo_t *cr, unsigned int lineWidth, const std::string &color, unsigned int width, unsigned int height) {
+    GdkRGBA rgba{};
+    cairo_arc(cr, width / 2.0, height / 2.0, width / 2.0 - lineWidth, 0.0, 2 * M_PI);
+    gdk_rgba_parse(&rgba, color.c_str());
+    gdk_cairo_set_source_rgba(cr, &rgba);
+    cairo_stroke(cr);
 }
