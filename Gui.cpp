@@ -583,7 +583,7 @@ gboolean Gui::player1ColorChooseDrawingAreaDrawCB(GtkWidget *widget, cairo_t *cr
 
     gtk_render_background(context, cr, 0, 0, width, height);
 
-    gui->drawX(cr, lineWidth, gui->player1color, width, height);
+    gui->drawO(cr, lineWidth, gui->player1color, width, height);
 
     return false;
 }
@@ -602,7 +602,7 @@ gboolean Gui::player2ColorChooseDrawingAreaDrawCB(GtkWidget *widget, cairo_t *cr
 
     gtk_render_background(context, cr, 0, 0, width, height);
 
-    gui->drawO(cr, lineWidth, gui->player2color, width, height);
+    gui->drawX(cr, lineWidth, gui->player2color, width, height);
 
     return false;
 }
