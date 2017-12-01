@@ -4,6 +4,8 @@
 #include <gtk/gtk.h>
 #include "GameLogic.h"
 
+#define PLAY_GRID_CELL_MIN_SIZE 30
+
 class Gui {
 private:
     int argc;
@@ -16,7 +18,6 @@ private:
     GtkWidget *homeScreen;
     GtkWidget *playGrid;
     GtkWidget *menuBarBox;
-    GtkWidget *statusBar;
     GtkWidget *activePlayerLabel;
 
     unsigned int gridSizeScaleValue = DEFAULT_GRID_SIZE;
@@ -34,8 +35,6 @@ private:
 
     void createPlayGrid();
 
-    void createStatusBar();
-
     void showHomeScreen();
 
     void showGameScreen();
@@ -48,9 +47,7 @@ private:
 
     void startNewGame();
 
-    void redrawButton(GtkWidget *widget, std::string color);
-
-    void getButtonIndices(GtkWidget *widget, unsigned long *row, unsigned long *col);
+    void getPlayGridCellIndices(GtkWidget *widget, unsigned long *row, unsigned long *col);
 
     void removeAllChildrenFromLayoutContainer();
 
@@ -67,16 +64,24 @@ private:
 
     void changeBorderWidthOfWidget(GtkWidget *widget, unsigned int width);
 
+    void changeBorderColorOfWidget(GtkWidget *widget, const std::string &color);
+
+    void changeBackgroundColorOfWidget(GtkWidget *widget, const std::string &color);
+
+    void setBackgroundGradientToWidget(GtkWidget *widget, const std::string &color1, const std::string &color2);
+
+    void setBackgroundGradientOnHoverToWidget(GtkWidget *widget, const std::string &color1, const std::string &color2);
+
+    void setMinSizeOfMainWindow(int size);
+
     // Callbacks
     static void activateApplicationCB(GtkApplication *app, gpointer data);
 
     static void destroyMainWindowCB(GtkWidget *widget, gpointer data);
 
-    static void playGridButtonClickedCB(GtkWidget *widget, gpointer data);
+    static gboolean playGridCellButtonPressEventCB(GtkWidget *widget, GdkEvent *event, gpointer data);
 
-    static void playGridButtonSizeAllocateCB(GtkWidget *widget, gpointer data);
-
-    static gboolean drawWinStroke(GtkWidget *widget, cairo_t *cr, gpointer data);
+    static gboolean playGridCellDrawCB(GtkWidget *widget, cairo_t *cr, gpointer data);
 
     static void startButtonClickedCB(GtkWidget *widget, gpointer data);
 

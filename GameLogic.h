@@ -26,6 +26,9 @@ private:
     std::vector<std::string> winSymbolSequenceVector;
     unsigned short activePlayerIndex = 0;
     bool gameRunning = true;
+    bool tieGame = false;
+    unsigned long numberOfMoves = 0;
+    Player *winner = nullptr;
 
     unsigned long firstWinningCellRow;
     unsigned long firstWinningCellCol;
@@ -67,9 +70,15 @@ public:
 
     Player *getActivePlayer();
 
-    Player *getWinner();
+    Player *getWinner() const;
 
     const std::vector<Cell *> &getWinningCells() const;
+
+    WinningCellSequenceDirection getWinningCellSequenceDirection() const;
+
+    bool isCellWinning(Cell *cell);
+
+    bool isTieGame() const;
 };
 
 

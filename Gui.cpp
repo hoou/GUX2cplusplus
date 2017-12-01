@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdlib.h>
+#include <cmath>
 #include "Gui.h"
 #include "utils.h"
 
@@ -38,17 +39,12 @@ void Gui::createMainWindow() {
     mainWindow = gtk_application_window_new(gtkApplication);
     gtk_window_set_title(GTK_WINDOW(mainWindow), "Piskvorky");
 
-    GdkGeometry hints{};
-    hints.min_width = 512;
-    hints.min_height = 512;
-
-    gtk_window_set_geometry_hints(GTK_WINDOW(mainWindow), mainWindow, &hints, GDK_HINT_MIN_SIZE);
-
     g_signal_connect(mainWindow, "destroy", G_CALLBACK(destroyMainWindowCB), this);
 }
 
 void Gui::createLayoutContainer() {
     layoutContainer = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_set_margin_bottom(layoutContainer, 20);
     gtk_container_add(GTK_CONTAINER(mainWindow), layoutContainer);
 }
 
@@ -61,6 +57,7 @@ void Gui::createHomeScreen() {
     gtk_widget_set_vexpand(box, true);
     gtk_widget_set_margin_start(box, 30);
     gtk_widget_set_margin_end(box, 30);
+    gtk_widget_set_margin_top(box, 30);
     gtk_widget_set_margin_bottom(box, 30);
     gtk_widget_set_hexpand(box, true);
 
@@ -151,6 +148,7 @@ void Gui::createHomeScreen() {
 
 void Gui::createMenuBar() {
     GtkWidget *gameMenu, *helpMenu, *gameMenuItem, *helpMenuItem, *newGameMenuItem, *restartGameMenuItem, *quitMenuItem, *menuBar, *aboutMenuItem;
+    GtkWidget *label, *box;
 
     menuBar = gtk_menu_bar_new();
 
@@ -175,61 +173,52 @@ void Gui::createMenuBar() {
     g_signal_connect(quitMenuItem, "activate", G_CALLBACK(quitMenuItemActivateCB), this);
     g_signal_connect(aboutMenuItem, "activate", G_CALLBACK(aboutMenuItemActivateCB), this);
 
-    menuBarBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+    menuBarBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 
-    gtk_box_pack_start(GTK_BOX(menuBarBox), menuBar, true, true, 0);
+    // Create labels for game status as the part of the menu bar
+    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    gtk_widget_set_halign(box, GTK_ALIGN_END);
+    gtk_widget_set_margin_end(box, 10);
+
+    label = gtk_label_new("on the move: ");
+    activePlayerLabel = gtk_label_new("");
+    gtk_widget_set_size_request(activePlayerLabel, 30, -1);
+    gtk_box_pack_start(GTK_BOX(box), label, false, false, 0);
+    gtk_box_pack_start(GTK_BOX(box), activePlayerLabel, false, false, 0);
+
+    gtk_box_pack_start(GTK_BOX(menuBarBox), menuBar, false, false, 0);
+    gtk_box_pack_start(GTK_BOX(menuBarBox), box, true, true, 0);
 }
 
 void Gui::createPlayGrid() {
-    GtkWidget *button, *overlay, *label;
+    GtkWidget *cell;
 
     playGrid = gtk_grid_new();
 
-    gtk_grid_set_column_homogeneous(GTK_GRID(playGrid), true);
-    gtk_grid_set_row_homogeneous(GTK_GRID(playGrid), true);
-
     for (unsigned int row = 0; row < gameLogic->getGridSize(); row++) {
         for (unsigned int col = 0; col < gameLogic->getGridSize(); col++) {
-            button = gtk_button_new();
+            cell = gtk_drawing_area_new();
 
-            changeBorderRadiusOfWidget(button, 0);
-            changeBorderWidthOfWidget(button, 1);
+            setBackgroundGradientToWidget(cell, "#f4f5f5", "#dfdddd");
 
-            label = gtk_label_new(" ");
-            overlay = gtk_overlay_new();
+            g_signal_connect(cell, "draw", G_CALLBACK(playGridCellDrawCB), this);
+            g_signal_connect(cell, "button-press-event", G_CALLBACK(playGridCellButtonPressEventCB), this);
 
-            gtk_container_add(GTK_CONTAINER(button), label);
-            gtk_overlay_add_overlay(GTK_OVERLAY(overlay), button);
+            gtk_widget_set_events(cell, gtk_widget_get_events(cell) | GDK_BUTTON_PRESS_MASK);
 
-            gtk_widget_set_hexpand(button, true);
-            gtk_widget_set_vexpand(button, true);
-
-            gtk_widget_set_hexpand(overlay, true);
-            gtk_widget_set_vexpand(overlay, true);
-
-            g_signal_connect(button, "clicked", G_CALLBACK(playGridButtonClickedCB), this);
-            g_signal_connect(button, "size-allocate", G_CALLBACK(playGridButtonSizeAllocateCB), this);
-
-            gtk_grid_attach(GTK_GRID(playGrid), overlay, row, col, 1, 1);
+            gtk_grid_attach(GTK_GRID(playGrid), cell, row, col, 1, 1);
         }
     }
 }
 
-void Gui::createStatusBar() {
-    GtkWidget *label, *box;
-
-    statusBar = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
-
-    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
-
-    gtk_box_pack_start(GTK_BOX(statusBar), box, false, false, 20);
-
-    label = gtk_label_new("On the move: ");
-    activePlayerLabel = gtk_label_new("");
-    gtk_widget_set_size_request(activePlayerLabel, 50, 10);
-
-    gtk_box_pack_start(GTK_BOX(box), label, false, false, 0);
-    gtk_box_pack_start(GTK_BOX(box), activePlayerLabel, false, false, 0);
+void Gui::setMinSizeOfMainWindow(int size) {
+    GdkGeometry hints{};
+    hints.min_width = size;
+    hints.min_height = size;
+    hints.min_aspect = 1;
+    hints.max_aspect = 1;
+    gtk_window_set_geometry_hints(GTK_WINDOW(mainWindow), nullptr, &hints,
+                                  (GdkWindowHints) (GDK_HINT_MIN_SIZE | GDK_HINT_ASPECT));
 }
 
 void Gui::removeAllChildrenFromLayoutContainer() {
@@ -242,35 +231,51 @@ void Gui::showHomeScreen() {
     createHomeScreen();
     gtk_box_pack_start(GTK_BOX(layoutContainer), homeScreen, false, false, 0);
 
+    setMinSizeOfMainWindow(-1);
+    gtk_window_resize(GTK_WINDOW(mainWindow), 200, 200);
+
     gtk_widget_show_all(mainWindow);
 }
 
 void Gui::showGameScreen() {
     GtkWidget *aspectFrame;
+    unsigned int minSizeOfMainWindow;
 
     removeAllChildrenFromLayoutContainer();
 
     createMenuBar();
     createPlayGrid();
-    createStatusBar();
 
     aspectFrame = gtk_aspect_frame_new(nullptr, 0.5, 0.5, 1, false);
     gtk_container_add(GTK_CONTAINER(aspectFrame), playGrid);
 
-    gtk_widget_set_vexpand(statusBar, false);
-    gtk_widget_set_hexpand(statusBar, false);
-
     gtk_box_pack_start(GTK_BOX(layoutContainer), menuBarBox, false, false, 0);
     gtk_box_pack_start(GTK_BOX(layoutContainer), aspectFrame, true, true, 0);
-    gtk_box_pack_start(GTK_BOX(layoutContainer), statusBar, false, false, 0);
 
-    gtk_widget_set_halign(statusBar, GTK_ALIGN_CENTER);
+    // Set min size of window
+    minSizeOfMainWindow = gameLogic->getGridSize() * PLAY_GRID_CELL_MIN_SIZE;
+    if (minSizeOfMainWindow < 200)
+        minSizeOfMainWindow = 200;
+
+    setMinSizeOfMainWindow(minSizeOfMainWindow);
+
+    gtk_grid_set_column_homogeneous(GTK_GRID(playGrid), true);
+    gtk_grid_set_row_homogeneous(GTK_GRID(playGrid), true);
+    gtk_grid_set_column_spacing(GTK_GRID(playGrid), 1);
+    gtk_grid_set_row_spacing(GTK_GRID(playGrid), 1);
 
     gtk_widget_show_all(mainWindow);
 }
 
 void Gui::showGameOverWindow(Player *winner) {
-    std::string message = winner->getName() + " wins! Congratulations!\n";
+    std::string message;
+
+    if (winner) {
+        message = winner->getName() + " wins! Congratulations!";
+    } else {
+        message = "Tie game!";
+    }
+
     GtkWidget *gameOverDialog = gtk_message_dialog_new(GTK_WINDOW(mainWindow), GTK_DIALOG_MODAL, GTK_MESSAGE_INFO,
                                                        GTK_BUTTONS_NONE, "%s", message.c_str());
 
@@ -294,32 +299,20 @@ void Gui::showAboutDialog() {
             "copyright", "© 2017 Tibor Mikita",
             "logo-icon-name", NULL,
             "program-name", "Piskvorky",
-            "version", "1.0",
+            "version", "2.0",
             NULL
     );
 }
 
-void Gui::getButtonIndices(GtkWidget *widget, unsigned long *row, unsigned long *col) {
+void Gui::getPlayGridCellIndices(GtkWidget *widget, unsigned long *row, unsigned long *col) {
     gint left, top;
 
-    gtk_container_child_get(GTK_CONTAINER(playGrid), gtk_widget_get_parent(widget),
+    gtk_container_child_get(GTK_CONTAINER(playGrid), widget,
                             "top-attach", &top,
                             "left-attach", &left,
                             NULL);
     *row = static_cast<unsigned long>(top);
     *col = static_cast<unsigned long>(left);
-}
-
-void Gui::redrawButton(GtkWidget *widget, std::string color) {
-    unsigned long row, col;
-
-    getButtonIndices(widget, &row, &col);
-
-    Cell *cell = gameLogic->getCell(row, col);
-
-    gtk_button_set_label(GTK_BUTTON(widget), cell->getStringValue().c_str());
-
-    changeFontColorOfWidget(gtk_bin_get_child(GTK_BIN(widget)), color);
 }
 
 void Gui::removeWidget(GtkWidget *widget, gpointer data) {
@@ -346,7 +339,8 @@ void Gui::changeFontColorOfWidget(GtkWidget *widget, const std::string &color) {
 
 void Gui::changeBorderRadiusOfWidget(GtkWidget *widget, unsigned int radius) {
     GtkCssProvider *provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(provider, ("* {border-radius: " + to_string(radius) + "pt; }").c_str(), -1, nullptr);
+    gtk_css_provider_load_from_data(provider, ("* {border-radius: " + to_string(radius) + "pt; }").c_str(), -1,
+                                    nullptr);
     GtkStyleContext *context = gtk_widget_get_style_context(widget);
     gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 }
@@ -354,6 +348,45 @@ void Gui::changeBorderRadiusOfWidget(GtkWidget *widget, unsigned int radius) {
 void Gui::changeBorderWidthOfWidget(GtkWidget *widget, unsigned int width) {
     GtkCssProvider *provider = gtk_css_provider_new();
     gtk_css_provider_load_from_data(provider, ("* {border-width: " + to_string(width) + "pt; }").c_str(), -1, nullptr);
+    GtkStyleContext *context = gtk_widget_get_style_context(widget);
+    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
+}
+
+void Gui::changeBorderColorOfWidget(GtkWidget *widget, const std::string &color) {
+    GtkCssProvider *provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(provider, ("* {border-color: " + color + "; }").c_str(), -1, nullptr);
+    GtkStyleContext *context = gtk_widget_get_style_context(widget);
+    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
+}
+
+void Gui::changeBackgroundColorOfWidget(GtkWidget *widget, const std::string &color) {
+    GtkCssProvider *provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(provider, ("* {background-color: " + color + "; }").c_str(), -1, nullptr);
+    GtkStyleContext *context = gtk_widget_get_style_context(widget);
+    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
+}
+
+void Gui::setBackgroundGradientToWidget(GtkWidget *widget, const std::string &color1, const std::string &color2) {
+    GtkCssProvider *provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(
+            provider,
+            ("* {background: linear-gradient(to bottom," + color1 + ", " + color2 + "); }").c_str(),
+            -1,
+            nullptr
+    );
+    GtkStyleContext *context = gtk_widget_get_style_context(widget);
+    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
+}
+
+void
+Gui::setBackgroundGradientOnHoverToWidget(GtkWidget *widget, const std::string &color1, const std::string &color2) {
+    GtkCssProvider *provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(
+            provider,
+            ("*:active {background: linear-gradient(to bottom," + color1 + ", " + color2 + "); }").c_str(),
+            -1,
+            nullptr
+    );
     GtkStyleContext *context = gtk_widget_get_style_context(widget);
     gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 }
@@ -369,48 +402,109 @@ void Gui::activateApplicationCB(GtkApplication *app, gpointer data) {
     gtk_widget_show_all(((Gui *) data)->mainWindow);
 }
 
-void Gui::playGridButtonClickedCB(GtkWidget *widget, gpointer data) {
+gboolean Gui::playGridCellButtonPressEventCB(GtkWidget *widget, GdkEvent *event, gpointer data) {
     unsigned long row, col;
     bool result;
     auto *gui = (Gui *) data;
-    std::string color = gui->gameLogic->getActivePlayer()->getColor();
 
-    gui->getButtonIndices(widget, &row, &col);
+    gui->getPlayGridCellIndices(widget, &row, &col);
 
     result = gui->gameLogic->updateGrid(row, col);
 
     if (result) {
-        gui->redrawButton(widget, color);
-
         Player *winner = gui->gameLogic->getWinner();
         if (winner) {
             gui->showGameOverWindow(winner);
-
-            for (auto cell : gui->gameLogic->getWinningCells()) {
-                GtkWidget *winningCell = gtk_grid_get_child_at(GTK_GRID(gui->playGrid),
-                                                               static_cast<gint>(cell->getCol()),
-                                                               static_cast<gint>(cell->getRow()));
-                GtkWidget *drawingArea = gtk_drawing_area_new();
-
-                g_signal_connect(G_OBJECT(drawingArea), "draw", G_CALLBACK(drawWinStroke), cell);
-
-                gtk_overlay_add_overlay(GTK_OVERLAY(winningCell), drawingArea);
-                gtk_widget_show_all(winningCell);
-            }
+        } else if (gui->gameLogic->isTieGame()) {
+            gui->showGameOverWindow(nullptr);
         }
 
         gtk_widget_set_sensitive(widget, false);
 
         gui->updateActivePlayerLabel();
     }
+
+    return false;
 }
 
-void Gui::playGridButtonSizeAllocateCB(GtkWidget *widget, gpointer data) {
-    auto *gui = static_cast<Gui *>(data);
+gboolean Gui::playGridCellDrawCB(GtkWidget *widget, cairo_t *cr, gpointer data) {
+    auto *gui = (Gui *) data;
+    unsigned long row, col;
 
-    auto fontSize = static_cast<unsigned int>(gtk_widget_get_allocated_width(widget) / 3.0);
+    guint width, height;
+    GdkRGBA color{};
+    GtkStyleContext *context;
 
-    gui->changeFontSizeOfWidget(widget, fontSize);
+    context = gtk_widget_get_style_context(widget);
+
+    width = static_cast<guint>(gtk_widget_get_allocated_width(widget));
+    height = static_cast<guint>(gtk_widget_get_allocated_height(widget));
+
+    gtk_render_background(context, cr, 0, 0, width, height);
+
+    // Setup line width
+    auto lineWidth = (int) (gtk_widget_get_allocated_width(widget) / 10.0);
+    cairo_set_line_width(cr, lineWidth);
+
+    // Get cell information from game logic
+    gui->getPlayGridCellIndices(widget, &row, &col);
+    Cell *cell = gui->gameLogic->getCell(row, col);
+
+    // If cell not empty, draw X or O
+    switch (cell->getValue()) {
+        case X:
+            cairo_move_to(cr, 0 + lineWidth, 0 + lineWidth);
+            cairo_line_to(cr, width - lineWidth, height - lineWidth);
+            cairo_move_to(cr, width - lineWidth, 0 + lineWidth);
+            cairo_line_to(cr, 0 + lineWidth, height - lineWidth);
+            gdk_rgba_parse(&color, cell->getColor().c_str());
+            gdk_cairo_set_source_rgba(cr, &color);
+            cairo_stroke(cr);
+            break;
+        case O:
+            cairo_arc(cr, width / 2.0, height / 2.0, width / 2.0 - lineWidth, 0.0, 2 * M_PI);
+            gdk_rgba_parse(&color, cell->getColor().c_str());
+            gdk_cairo_set_source_rgba(cr, &color);
+            cairo_stroke(cr);
+            break;
+        default:
+            break;
+    }
+
+    // If game is over and there is winner (no tie game)
+    if (!gui->gameLogic->isGameRunning() && !gui->gameLogic->isTieGame()) {
+        // If cell is winning, draw win stroke
+        if (gui->gameLogic->isCellWinning(cell)) {
+            cairo_set_line_width(cr, lineWidth * 2);
+            switch (gui->gameLogic->getWinningCellSequenceDirection()) {
+                case Horizontal:
+                    cairo_move_to(cr, 0, height / 2.0);
+                    cairo_line_to(cr, width, height / 2.0);
+                    break;
+                case Vertical:
+                    cairo_move_to(cr, width / 2.0, 0);
+                    cairo_line_to(cr, width / 2.0, height);
+                    break;
+                case Diagonal:
+                    cairo_move_to(cr, 0, 0);
+                    cairo_line_to(cr, width, height);
+                    break;
+                case OppositeDiagonal:
+                    cairo_move_to(cr, width, 0);
+                    cairo_line_to(cr, 0, height);
+                    break;
+                default:
+                    break;
+            }
+
+            gdk_rgba_parse(&color, "black");
+            gdk_cairo_set_source_rgba(cr, &color);
+
+            cairo_stroke(cr);
+        }
+    }
+
+    return FALSE;
 }
 
 void Gui::updateActivePlayerLabel() {
@@ -421,53 +515,6 @@ void Gui::updateActivePlayerLabel() {
     changeFontSizeOfWidget(activePlayerLabel, 14);
 
     gtk_label_set_text(GTK_LABEL(activePlayerLabel), symbol.c_str());
-}
-
-gboolean Gui::drawWinStroke(GtkWidget *widget, cairo_t *cr, gpointer data) {
-    int width, height;
-    GdkRGBA color{};
-    GtkStyleContext *context;
-    auto *cell = (Cell *) (data);
-
-    context = gtk_widget_get_style_context(widget);
-
-    width = gtk_widget_get_allocated_width(widget);
-    height = gtk_widget_get_allocated_height(widget);
-
-    gtk_render_background(context, cr, 0, 0, width, height);
-
-    int buttonWidth = gtk_widget_get_allocated_width(widget);
-
-    cairo_set_line_width(cr, (int)(buttonWidth / 10.0));
-
-    switch (cell->getWinningCellSequenceDirection()) {
-        case Horizontal:
-            cairo_move_to(cr, 0, height / 2.0);
-            cairo_line_to(cr, width, height / 2.0);
-            break;
-        case Vertical:
-            cairo_move_to(cr, width / 2.0, 0);
-            cairo_line_to(cr, width / 2.0, height);
-            break;
-        case Diagonal:
-            cairo_move_to(cr, 0, 0);
-            cairo_line_to(cr, width, height);
-            break;
-        case OppositeDiagonal:
-            cairo_move_to(cr, width, 0);
-            cairo_line_to(cr, 0, height);
-            break;
-        default:
-            break;
-    }
-
-    gtk_style_context_get_color(context,
-                                gtk_style_context_get_state(context),
-                                &color);
-    gdk_cairo_set_source_rgba(cr, &color);
-
-    cairo_stroke(cr);
-    return false;
 }
 
 void Gui::startButtonClickedCB(GtkWidget *widget, gpointer data) {

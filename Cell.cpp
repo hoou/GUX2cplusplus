@@ -39,10 +39,10 @@ unsigned long Cell::getCol() const {
     return col;
 }
 
-WinningCellSequenceDirection Cell::getWinningCellSequenceDirection() const {
-    return winningCellSequenceDirection;
+const std::string &Cell::getColor() const {
+    return color;
 }
 
-void Cell::setWinningCellSequenceDirection(WinningCellSequenceDirection winningCellSequenceDirection) {
-    Cell::winningCellSequenceDirection = winningCellSequenceDirection;
+void Cell::setColor(const std::string &color) {
+    Cell::color = color;
 }

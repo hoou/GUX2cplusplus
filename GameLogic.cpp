@@ -63,12 +63,21 @@ bool GameLogic::updateGrid(unsigned long row, unsigned long col) {
         return false;
 
     cells.at(row).at(col)->setValue(getActivePlayer()->getSymbol());
+    cells.at(row).at(col)->setColor(getActivePlayer()->getColor());
+    numberOfMoves++;
 
     if (doWeHaveWinner(row, col)) {
+        winner = getActivePlayer();
         setupWinningCells();
         stopGame();
-    } else
+    } else {
         swapActivePlayer();
+
+        if (numberOfMoves == gridSize * gridSize) {
+            tieGame = true;
+            stopGame();
+        }
+    }
 
     return true;
 }
@@ -220,7 +229,6 @@ void GameLogic::setupWinningCells() {
     for (i = 0; i < (int) numberOfCellsInRowToWin; i++) {
         negativei = -i;
         Cell *cell = cells.at(firstWinningCellRow + *rowOffset).at(firstWinningCellCol + *colOffset);
-        cell->setWinningCellSequenceDirection(winningCellSequenceDirection);
         winningCells.push_back(cell);
     }
 }
@@ -243,13 +251,29 @@ bool GameLogic::isGameRunning() const {
     return gameRunning;
 }
 
-Player *GameLogic::getWinner() {
-    if (isGameRunning())
-        return nullptr;
-    else
-        return getActivePlayer();
-}
-
 const std::vector<Cell *> &GameLogic::getWinningCells() const {
         return winningCells;
     }
+
+WinningCellSequenceDirection GameLogic::getWinningCellSequenceDirection() const {
+    return winningCellSequenceDirection;
+}
+
+bool GameLogic::isCellWinning(Cell *cell) {
+    bool result = false;
+
+    for(auto currentCell : winningCells) {
+        if (cell->getCol() == currentCell->getCol() && cell->getRow() == currentCell->getRow())
+            return true;
+    }
+
+    return result;
+}
+
+bool GameLogic::isTieGame() const {
+    return tieGame;
+}
+
+Player *GameLogic::getWinner() const {
+    return winner;
+}

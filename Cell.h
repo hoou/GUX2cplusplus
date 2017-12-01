@@ -3,6 +3,8 @@
 
 #include <string>
 
+#define DEFAULT_CELL_COLOR "black"
+
 typedef enum {
     Empty,
     O,
@@ -13,16 +15,15 @@ typedef enum {
     Horizontal,
     Vertical,
     Diagonal,
-    OppositeDiagonal,
-    Unknown
+    OppositeDiagonal
 } WinningCellSequenceDirection;
 
 class Cell {
 private:
     unsigned long row;
     unsigned long col;
+    std::string color = DEFAULT_CELL_COLOR;
     CellValue value = Empty;
-    WinningCellSequenceDirection winningCellSequenceDirection = Unknown;
 
 public:
     Cell(unsigned long row, unsigned long col);
@@ -41,9 +42,9 @@ public:
 
     unsigned long getCol() const;
 
-    WinningCellSequenceDirection getWinningCellSequenceDirection() const;
+    const std::string &getColor() const;
 
-    void setWinningCellSequenceDirection(WinningCellSequenceDirection winningCellSequenceDirection);
+    void setColor(const std::string &color);
 };
 
 
