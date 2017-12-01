@@ -38,6 +38,8 @@ void Gui::createMainWindow() {
     mainWindow = gtk_application_window_new(gtkApplication);
     gtk_window_set_title(GTK_WINDOW(mainWindow), "Piskvorky");
 
+    changeBackgroundColorOfWidget(mainWindow, "#bdbdbd");
+
     g_signal_connect(mainWindow, "destroy", G_CALLBACK(destroyMainWindowCB), this);
 }
 
@@ -166,6 +168,8 @@ void Gui::createMenuBar() {
     GtkWidget *label, *box;
 
     menuBar = gtk_menu_bar_new();
+
+    changeBackgroundColorOfWidget(menuBar, "#bdbdbd");
 
     gameMenu = gtk_menu_new();
     helpMenu = gtk_menu_new();
