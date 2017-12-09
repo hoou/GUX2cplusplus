@@ -10,7 +10,7 @@ class Gui {
 private:
     int argc;
     char **argv;
-    GameLogic *gameLogic;
+    GameLogic *gameLogic = nullptr;
 
     GtkApplication *gtkApplication;
     GtkWidget *mainWindow;
@@ -117,6 +117,8 @@ private:
 public:
 
     Gui(int argc, char **argv);
+
+    virtual ~Gui();
 
     int run();
 

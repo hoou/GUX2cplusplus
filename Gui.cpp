@@ -12,6 +12,10 @@ Gui::Gui(int argc, char **argv) : argc(argc), argv(argv) {
     g_signal_connect(gtkApplication, "activate", G_CALLBACK(activateApplicationCB), this);
 }
 
+Gui::~Gui() {
+    delete gameLogic;
+}
+
 void Gui::initGui() {
     createMainWindow();
     createLayoutContainer();
